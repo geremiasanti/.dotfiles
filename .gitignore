@@ -1,11 +1,11 @@
 # ignore all
 *
 
-# whitelist files for repo
+# unignore files for repo
 !.gitignore
 !README.md
 
-# whitelist configuration files
+# unignore configuration files
 !.bashrc
 !.tmux.conf
 !.config/
