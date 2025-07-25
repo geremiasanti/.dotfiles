@@ -1,0 +1,20 @@
+# ignore all
+*
+
+# whitelist files for repo
+!.gitignore
+!README.md
+
+# whitelist configuration files
+!.bashrc
+!.tmux.conf
+!.config/
+!.config/nvim/
+!.config/nvim/**
+!.config/alacritty/
+!.config/alacritty/**
+!.config/i3/
+!.config/i3/**
+!.config/custom/
+!.config/custom/**
+
