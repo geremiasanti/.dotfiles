@@ -38,6 +38,18 @@ return {
         })
       end,
     })
+    local lspconfig_util = require("lspconfig.util") 
+    require("lspconfig").eslint.setup({
+      -- use local eslint installation 
+      cmd = { "node", vim.fn.getcwd() .. "/node_modules/.bin/vscode-eslint-language-server", "--stdio" },
+      root_dir = lspconfig_util.root_pattern("eslint.config.js", "package.json"),
+      on_attach = function(_, bufnr)
+        vim.api.nvim_create_autocmd("BufWritePre", {
+          buffer = bufnr,
+          command = "EslintFixAll",
+        })
+      end,
+    })
 
     -- config
     vim.diagnostic.config({
