@@ -41,13 +41,6 @@ exec --no-startup-id xss-lock --transfer-sleep-lock -- i3lock --nofork
 # and nm-applet is a desktop environment-independent system tray GUI for it.
 exec --no-startup-id nm-applet
 
-# Use pactl to adjust volume in PulseAudio.
-set $refresh_i3status killall -SIGUSR1 i3status
-bindsym XF86AudioRaiseVolume exec --no-startup-id pactl set-sink-volume @DEFAULT_SINK@ +10% && $refresh_i3status
-bindsym XF86AudioLowerVolume exec --no-startup-id pactl set-sink-volume @DEFAULT_SINK@ -10% && $refresh_i3status
-bindsym XF86AudioMute exec --no-startup-id pactl set-sink-mute @DEFAULT_SINK@ toggle && $refresh_i3status
-bindsym XF86AudioMicMute exec --no-startup-id pactl set-source-mute @DEFAULT_SOURCE@ toggle && $refresh_i3status
-
 # Use Mouse+$mod to drag floating windows to their wanted position
 floating_modifier $mod
 
@@ -173,7 +166,6 @@ bindsym $mod+Shift+s exec scrot ~/Pictures/Screenshots/screenshot_%Y-%m-%d-%H%M%
 bindsym $mod+Ctrl+s exec --no-startup-id alacritty --title scrot -e scrot -s ~/Pictures/Screenshots/screenshot_%Y-%m-%d-%H%M%S.png
 for_window [title="^scrot$"] move to scratchpad
 
-# resize window (you can also use the mouse for that)
 mode "resize" {
         # resize
         bindsym Left resize shrink width 10 px or 10 ppt
