@@ -182,11 +182,11 @@ bindsym $mod+r mode "resize"
 
 mode "audio" {
     # volume down
-    bindsym Down exec --no-startup-id sh -c 'amixer set Master 5%- && aplay /usr/share/sounds/sound-icons/capital'
+    bindsym Down exec --no-startup-id sh -c 'amixer set Master 5%- && vol=$(amixer get Master | grep -o "[0-9]*%" | head -1) && notify-send "Volume: $vol" && aplay /usr/share/sounds/sound-icons/capital'
     # volume up
-    bindsym Up exec --no-startup-id sh -c 'amixer set Master 5%+ && aplay /usr/share/sounds/sound-icons/capital'
-    # mute
-    bindsym Tab exec --no-startup-id sh -c 'amixer set Master toggle && aplay /usr/share/sounds/sound-icons/capital'
+    bindsym Up exec --no-startup-id sh -c 'amixer set Master 5%+ && vol=$(amixer get Master | grep -o "[0-9]*%" | head -1) && notify-send "Volume: $vol" && aplay /usr/share/sounds/sound-icons/capital'
+    # toggle
+    bindsym Tab exec --no-startup-id sh -c 'amixer set Master toggle && state=$(amixer get Master | grep -o "\\[on\\]\\|\\[off\\]" | head -1) && vol=$(amixer get Master | grep -o "[0-9]*%" | head -1) && notify-send "Audio: $state ($vol)" && aplay /usr/share/sounds/sound-icons/capital'
 
     # back to normal: Enter or Escape or $mod+a
     bindsym Return mode "default"
