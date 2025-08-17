@@ -17,4 +17,5 @@
 !.config/i3/**
 !.config/custom/
 !.config/custom/**
-
+!.config/assets/
+!.config/assets/**
