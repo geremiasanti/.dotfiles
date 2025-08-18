@@ -18,30 +18,27 @@ return {
   config = function()
     local lspconfig = require('lspconfig')
 
-    -- servers
     lspconfig.ruby_lsp.setup({
       on_attach = function(client , bufnr)
         lsp_keymap(bufnr)
       end
     })
+
     lspconfig.ts_ls.setup({
       on_attach = function(client , bufnr)
         lsp_keymap(bufnr)
       end
     })
-    lspconfig.eslint.setup({
-      on_attach = function(client, bufnr)
-        lsp_keymap(bufnr)
-        vim.api.nvim_create_autocmd("BufWritePre", {
-          buffer = bufnr,
-          command = "EslintFixAll",
-        })
-      end,
-    })
+
+    local cmd = { "vscode-eslint-language-server", "--stdio" }
+    local local_eslint = vim.fn.getcwd() .. "/node_modules/.bin/vscode-eslint-language-server"
+    if vim.fn.filereadable(local_eslint) == 1 then
+      -- use project eslint installation if present
+      cmd = { "node", local_eslint, "--stdio" }
+    end
     local lspconfig_util = require("lspconfig.util") 
-    require("lspconfig").eslint.setup({
-      -- use local eslint installation 
-      cmd = { "node", vim.fn.getcwd() .. "/node_modules/.bin/vscode-eslint-language-server", "--stdio" },
+    lspconfig.eslint.setup({
+      cmd = cmd,
       root_dir = lspconfig_util.root_pattern("eslint.config.js", "package.json"),
       on_attach = function(_, bufnr)
         vim.api.nvim_create_autocmd("BufWritePre", {
