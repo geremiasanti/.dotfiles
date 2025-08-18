@@ -17,6 +17,7 @@ return {
   'neovim/nvim-lspconfig',
   config = function()
     local lspconfig = require('lspconfig')
+    local lspconfig_util = require("lspconfig.util") 
 
     lspconfig.ruby_lsp.setup({
       on_attach = function(client , bufnr)
@@ -30,13 +31,12 @@ return {
       end
     })
 
-    local cmd = { "vscode-eslint-language-server", "--stdio" }
     local local_eslint = vim.fn.getcwd() .. "/node_modules/.bin/vscode-eslint-language-server"
+    local cmd = { "vscode-eslint-language-server", "--stdio" }
     if vim.fn.filereadable(local_eslint) == 1 then
       -- use project eslint installation if present
       cmd = { "node", local_eslint, "--stdio" }
     end
-    local lspconfig_util = require("lspconfig.util") 
     lspconfig.eslint.setup({
       cmd = cmd,
       root_dir = lspconfig_util.root_pattern("eslint.config.js", "package.json"),
