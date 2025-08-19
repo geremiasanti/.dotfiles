@@ -1,8 +1,4 @@
-# Dotfiles Bare Repo
-
-This repository manages my personal dotfiles using a bare Git repository
-
-## Setup
+# Dotfiles Bare Repo Setup
 
 ```sh
 git clone --bare git@github.com:geremiasanti/.dotfiles.git $HOME/.dotfiles
@@ -12,7 +8,7 @@ dotfiles checkout
 dotfiles config --local status.showUntrackedFiles no
 ```
 
-## Usage
+# Usage
 
 Only files unignored in `.gitignore` are tracked.
 
@@ -28,8 +24,6 @@ dotfiles commit -m "Update bashrc"
 ## Installing Picom (ibhagwan fork) on Ubuntu + i3
 
 Steps to install the blur-capable fork of `picom` (ibhagwan) on Ubuntu 24.04 with the i3 window manager.
-
----
 
 ### 1. Remove default picom (optional)
 ```bash
