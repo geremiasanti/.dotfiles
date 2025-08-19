@@ -17,5 +17,7 @@
 !.config/i3/**
 !.config/custom/
 !.config/custom/**
+!.config/picom/
+!.config/picom/**
 !.config/assets/
 !.config/assets/**
