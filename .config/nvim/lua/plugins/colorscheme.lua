@@ -1,3 +1,13 @@
+-- colors
+--vim.cmd.colorscheme 'habamax'
+--vim.cmd [[
+--  highlight ColorColumn guibg=#101010
+--  highlight DiagnosticError guifg=#36454F
+--  highlight DiagnosticWarn guifg=#36454F
+--  highlight DiagnosticInfo guifg=#36454F
+--  highlight DiagnosticHint guifg=#708090
+--]]
+
 --return {
 --  "zenbones-theme/zenbones.nvim",
 --  dependencies = "rktjmp/lush.nvim",
@@ -36,7 +46,7 @@ return {
   config = function()
     vim.cmd('colorscheme github_dark_default')
 
-    -- transparent bg
+    -- bg transparency
     vim.cmd([[
       hi Normal guibg=NONE ctermbg=NONE
       hi NormalNC guibg=NONE ctermbg=NONE
@@ -45,8 +55,16 @@ return {
       hi SignColumn guibg=NONE ctermbg=NONE
 
       hi TabLine guibg=NONE ctermbg=NONE
-      hi TabLineFill guibg=NONE ctermbg=NONE
       hi TabLineSel guibg=NONE ctermbg=NONE
+      hi TabLineFill guibg=NONE ctermbg=NONE
+    ]])
+
+    -- Harpoon highlits for transparency
+    vim.cmd([[
+      hi HarpoonInactive guibg=NONE guifg=#8a8a8a
+      hi HarpoonActive guibg=NONE guifg=#8a8a8a gui=bold
+      hi HarpoonNumberInactive guibg=NONE guifg=#8190D4
+      hi HarpoonNumberActive guibg=NONE guifg=#8190D4 gui=bold
     ]])
   end
 }

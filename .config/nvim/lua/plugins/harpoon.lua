@@ -25,10 +25,10 @@ return {
       vim.keymap.set('n', '<leader>'..i, function() require('harpoon.ui').nav_file(i) end)
     end
     -- tabline style
-    vim.cmd('highlight! HarpoonNumberActive guibg=NONE guifg=#8190D4 gui=bold cterm=bold')
-    vim.cmd('highlight! HarpoonActive guibg=NONE guifg=#white')
-    vim.cmd('highlight! HarpoonNumberInactive guibg=#20303A guifg=#8190D4 gui=bold cterm=bold')
-    vim.cmd('highlight! HarpoonInactive guibg=#20303A guifg=#939E99')
+    --vim.cmd('highlight! HarpoonNumberActive guibg=NONE guifg=#8190D4 gui=bold cterm=bold')
+    --vim.cmd('highlight! HarpoonActive guibg=NONE guifg=#white')
+    --vim.cmd('highlight! HarpoonNumberInactive guibg=#20303A guifg=#8190D4 gui=bold cterm=bold')
+    --vim.cmd('highlight! HarpoonInactive guibg=#20303A guifg=#939E99')
     -- tabline redraw and visibility
     check_tabline_visibility()
     vim.api.nvim_create_autocmd('User', {

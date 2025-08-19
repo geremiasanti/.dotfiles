@@ -1,13 +1,3 @@
--- colors
---vim.cmd.colorscheme 'habamax'
---vim.cmd [[
---  highlight ColorColumn guibg=#101010
---  highlight DiagnosticError guifg=#36454F
---  highlight DiagnosticWarn guifg=#36454F
---  highlight DiagnosticInfo guifg=#36454F
---  highlight DiagnosticHint guifg=#708090
---]]
-
 -- Make line numbers default
 vim.wo.number = true
 vim.wo.relativenumber = true
@@ -32,8 +22,10 @@ vim.o.ignorecase = true
 vim.o.smartcase = true
 
 -- Keep signcolumn on by default
-vim.wo.signcolumn = 'yes'
-vim.o.colorcolumn = '80'
+--vim.wo.signcolumn = 'yes'
+
+-- Colorcolumn
+--vim.o.colorcolumn = '80' 
 
 -- Line numbers
 vim.wo.number = true
@@ -60,3 +52,7 @@ vim.opt.listchars = {
 
 -- vertical splits open on the right
 --vim.o.splitright = true
+--
+--
+
+-- Override highlights after any colorscheme is loaded
