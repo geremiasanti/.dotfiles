@@ -27,12 +27,12 @@ size = 16
 
 [window]
 decorations = 'None'
-opacity = 0.92
+opacity = 0.60
 
 [mouse]
 hide_when_typing = true
 
 [general]
 import = [
-    "~/.config/alacritty/themes/themes/gruvbox_dark.toml"
+    "~/.config/alacritty/themes/themes/github_dark.toml"
 ]
