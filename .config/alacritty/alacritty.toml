@@ -27,7 +27,7 @@ size = 16
 
 [window]
 decorations = 'None'
-#opacity = 0.85
+opacity = 0.85
 
 [mouse]
 hide_when_typing = true

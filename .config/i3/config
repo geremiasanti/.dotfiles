@@ -29,6 +29,9 @@ exec_always --no-startup-id ~/.config/custom/monitors.sh
 # background
 exec_always --no-startup-id feh --bg-fill ~/.config/assets/bg1.jpg
 
+# compositor (for transparency)
+exec_always --no-startup-id picom &
+
 # Start XDG autostart .desktop files using dex. See also
 # https://wiki.archlinux.org/index.php/XDG_Autostart
 exec --no-startup-id dex --autostart --environment i3

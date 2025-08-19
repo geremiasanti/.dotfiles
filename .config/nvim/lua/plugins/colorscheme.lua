@@ -35,6 +35,19 @@ return {
   lazy = false,
   config = function()
     vim.cmd('colorscheme github_dark_default')
+
+    -- transparent bg
+    vim.cmd([[
+      hi Normal guibg=NONE ctermbg=NONE
+      hi NormalNC guibg=NONE ctermbg=NONE
+      hi EndOfBuffer guibg=NONE ctermbg=NONE
+      hi LineNr guibg=NONE ctermbg=NONE
+      hi SignColumn guibg=NONE ctermbg=NONE
+
+      hi TabLine guibg=NONE ctermbg=NONE
+      hi TabLineFill guibg=NONE ctermbg=NONE
+      hi TabLineSel guibg=NONE ctermbg=NONE
+    ]])
   end
 }
 
