@@ -208,4 +208,4 @@ bar {
 }
 
 # gaps
-gaps inner 7px
+gaps inner 15px
