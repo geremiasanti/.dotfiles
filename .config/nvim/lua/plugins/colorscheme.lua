@@ -63,7 +63,7 @@ return {
     vim.cmd([[
       hi HarpoonInactive guibg=NONE guifg=#8a8a8a
       hi HarpoonActive guibg=NONE guifg=#8a8a8a gui=bold
-      hi HarpoonNumberInactive guibg=NONE guifg=#8190D4
+      hi HarpoonNumberInactive guibg=NONE guifg=#8a8a8a 
       hi HarpoonNumberActive guibg=NONE guifg=#8190D4 gui=bold
     ]])
   end
