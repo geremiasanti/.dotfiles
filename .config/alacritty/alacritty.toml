@@ -27,7 +27,7 @@ size = 16
 
 [window]
 decorations = 'None'
-opacity = 0.80
+opacity = 0.65
 
 [mouse]
 hide_when_typing = true
@@ -36,3 +36,6 @@ hide_when_typing = true
 import = [
     "~/.config/alacritty/themes/themes/github_dark.toml"
 ]
+
+[colors.primary]
+background = "0x111111" 
