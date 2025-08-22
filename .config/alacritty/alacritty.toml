@@ -26,8 +26,12 @@ size = 16
 #y = 0
 
 [window]
-decorations = 'None'
+#decorations = 'None'
 opacity = 0.65
+
+[window.padding]
+x = 6
+y = 6
 
 [mouse]
 hide_when_typing = true
