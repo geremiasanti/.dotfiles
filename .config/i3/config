@@ -28,6 +28,7 @@ exec_always --no-startup-id ~/.config/custom/monitors.sh
 
 # background
 exec_always --no-startup-id feh --bg-fill ~/.config/assets/bg2.jpg
+#exec_always --no-startup-id xsetroot -solid black
 
 # compositor
 exec_always --no-startup-id sh -c 'pkill -x picom; /usr/local/bin/picom --experimental-backends --config "$HOME/.config/picom/picom.conf"'
