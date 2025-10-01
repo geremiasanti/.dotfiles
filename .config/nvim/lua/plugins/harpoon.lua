@@ -24,7 +24,12 @@ return {
     for i=1,8 do
       vim.keymap.set('n', '<leader>'..i, function() require('harpoon.ui').nav_file(i) end)
     end
-    -- tabline style
+    -- tabline style (github_dark_dimmed)
+    vim.cmd('highlight! HarpoonNumberActive guibg=#22272e guifg=#8190D4 gui=bold cterm=bold')
+    vim.cmd('highlight! HarpoonActive guibg=#22272e guifg=#white')
+    vim.cmd('highlight! HarpoonNumberInactive guibg=#1e232a guifg=#8190D4 gui=bold cterm=bold')
+    vim.cmd('highlight! HarpoonInactive guibg=#1e232a guifg=#939E99')
+    -- tabline style (github_dark)
     --vim.cmd('highlight! HarpoonNumberActive guibg=NONE guifg=#8190D4 gui=bold cterm=bold')
     --vim.cmd('highlight! HarpoonActive guibg=NONE guifg=#white')
     --vim.cmd('highlight! HarpoonNumberInactive guibg=#20303A guifg=#8190D4 gui=bold cterm=bold')

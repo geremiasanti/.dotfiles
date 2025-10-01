@@ -44,28 +44,28 @@ return {
   'projekt0n/github-nvim-theme',
   lazy = false,
   config = function()
-    vim.cmd('colorscheme github_dark_default')
+    vim.cmd('colorscheme github_dark_dimmed')
 
-    -- bg transparency
-    vim.cmd([[
-      hi Normal guibg=NONE ctermbg=NONE
-      hi NormalNC guibg=NONE ctermbg=NONE
-      hi EndOfBuffer guibg=NONE ctermbg=NONE
-      hi LineNr guibg=NONE ctermbg=NONE
-      hi SignColumn guibg=NONE ctermbg=NONE
+    -- -- bg transparency
+    -- vim.cmd([[
+    --   hi Normal guibg=NONE ctermbg=NONE
+    --   hi NormalNC guibg=NONE ctermbg=NONE
+    --   hi EndOfBuffer guibg=NONE ctermbg=NONE
+    --   hi LineNr guibg=NONE ctermbg=NONE
+    --   hi SignColumn guibg=NONE ctermbg=NONE
 
-      hi TabLine guibg=NONE ctermbg=NONE
-      hi TabLineSel guibg=NONE ctermbg=NONE
-      hi TabLineFill guibg=NONE ctermbg=NONE
-    ]])
+    --   hi TabLine guibg=NONE ctermbg=NONE
+    --   hi TabLineSel guibg=NONE ctermbg=NONE
+    --   hi TabLineFill guibg=NONE ctermbg=NONE
+    -- ]])
 
-    -- Harpoon highlits for transparency
-    vim.cmd([[
-      hi HarpoonInactive guibg=NONE guifg=#8a8a8a
-      hi HarpoonActive guibg=NONE guifg=#8a8a8a gui=bold
-      hi HarpoonNumberInactive guibg=NONE guifg=#8a8a8a 
-      hi HarpoonNumberActive guibg=NONE guifg=#8190D4 gui=bold
-    ]])
+    -- -- Harpoon highlits for transparency
+    -- vim.cmd([[
+    --   hi HarpoonInactive guibg=NONE guifg=#8a8a8a
+    --   hi HarpoonActive guibg=NONE guifg=#8a8a8a gui=bold
+    --   hi HarpoonNumberInactive guibg=NONE guifg=#8a8a8a 
+    --   hi HarpoonNumberActive guibg=NONE guifg=#8190D4 gui=bold
+    -- ]])
   end
 }
 

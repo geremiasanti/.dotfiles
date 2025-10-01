@@ -27,7 +27,7 @@ size = 16
 
 [window]
 #decorations = 'None'
-opacity = 0.65
+#opacity = 0.65
 
 [window.padding]
 x = 5
@@ -42,4 +42,4 @@ import = [
 ]
 
 [colors.primary]
-background = "0x111111" 
+background = "0x22272e"
