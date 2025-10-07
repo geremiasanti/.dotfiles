@@ -1,0 +1,7 @@
+{
+  "extends": ["stylelint-config-standard-scss"],
+  "rules": {
+    "no-duplicate-selectors": true,
+    "block-no-empty": true
+  }
+}

@@ -48,6 +48,29 @@ return {
       end,
     })
 
+    lspconfig.cssls.setup {
+      settings = {
+        css = { validate = true },
+        scss = { validate = true },
+        less = { validate = true },
+      }
+    }
+    lspconfig.stylelint_lsp.setup {
+      settings = {
+        stylelintplus = {
+          configFile = '/home/geremia/.config/nvim/.stylelintrc.json',
+          configBasedir = '/home/geremia/.config/nvim', -- needed if your config uses extends/plugins
+          autoFixOnSave = false,
+          -- optional:
+          -- validateOnSave = true,
+          -- validateOnType = true,
+          -- configOverrides = {},
+        },
+      },
+      filetypes = { 'css', 'scss', 'sass', 'less', 'vue' },
+      root_dir = lspconfig.util.root_pattern('.git'),
+    }
+
     -- config
     vim.diagnostic.config({
       underline = false,
