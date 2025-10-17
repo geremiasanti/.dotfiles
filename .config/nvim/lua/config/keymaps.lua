@@ -17,3 +17,9 @@ vim.keymap.set("n", "s", substitute.operator, { noremap = true })
 vim.keymap.set("n", "ss", substitute.line, { noremap = true })
 vim.keymap.set("n", "S", substitute.eol, { noremap = true })
 vim.keymap.set("x", "s", substitute.visual, { noremap = true })
+
+-- navigate panes with alt+hjkl
+vim.keymap.set('n', '<A-h>', '<C-w>h', { noremap = true, silent = true })
+vim.keymap.set('n', '<A-j>', '<C-w>j', { noremap = true, silent = true })
+vim.keymap.set('n', '<A-k>', '<C-w>k', { noremap = true, silent = true })
+vim.keymap.set('n', '<A-l>', '<C-w>l', { noremap = true, silent = true })
