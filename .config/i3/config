@@ -66,10 +66,9 @@ bindsym $mod+e exec nautilus
 bindsym $mod+Shift+q kill
 
 # start dmenu (a program launcher)
-bindsym $mod+d exec --no-startup-id dmenu_run
+bindsym $mod+d exec --no-startup-id i3-dmenu-desktop
 
-# start dmenu (a program launcher)
-bindsym $mod+Shift+b exec --no-startup-id sh ~/.config/i3/bmks dmenu
+#bindsym $mod+Shift+b exec --no-startup-id sh ~/.config/i3/bmks dmenu
 
 # change focus
 bindsym $mod+h focus left
