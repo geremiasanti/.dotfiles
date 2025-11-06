@@ -165,3 +165,8 @@ alias dotfiles='/usr/bin/git --git-dir=$HOME/.dotfiles/ --work-tree=$HOME'
 
 # calendar (-b: rows, -M: week start on monday)
 alias ncal="ncal -b -M"
+
+# rails
+alias rs="rails s"
+alias rc="rails c"
+
