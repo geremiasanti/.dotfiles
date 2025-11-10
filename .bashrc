@@ -170,3 +170,5 @@ alias ncal="ncal -b -M"
 alias rs="rails s"
 alias rc="rails c"
 
+# nvim
+alias vi="nvim"

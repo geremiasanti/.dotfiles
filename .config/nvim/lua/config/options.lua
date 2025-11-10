@@ -32,7 +32,7 @@ vim.wo.number = true
 vim.wo.relativenumber = true
 
 -- keep cursor kinda centered
-vim.opt.scrolloff = 10
+--vim.opt.scrolloff = 10
 
 -- tabs
 -- handled by sleuth.vim
