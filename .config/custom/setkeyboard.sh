@@ -1,3 +1,3 @@
 #!/bin/sh
-sleep 5
+sleep 1
 setxkbmap us -option caps:escape
