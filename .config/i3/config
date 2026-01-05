@@ -200,7 +200,7 @@ mode "audio" {
 bindsym $mod+a mode "audio"
 
 # # default border width
-default_border pixel 1
+default_border pixel 3
 client.focused          #0969DA #0969DA #FFFFFF #0969DA #0969DA
 # default_floating_border pixel 1
 # # remove titlebars without killing the border
@@ -219,4 +219,4 @@ bar {
 }
 
 # gaps
-# gaps inner 12px
+gaps inner 12px
