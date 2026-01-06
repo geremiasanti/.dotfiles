@@ -172,3 +172,6 @@ alias rc="rails c"
 
 # nvim
 alias vi="nvim"
+
+# untracked (only for current machine)
+source ~/.config/custom/local.sh
