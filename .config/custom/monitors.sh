@@ -24,4 +24,4 @@ fi
 notify-send "Display setup" "$notification_body"
 
 # background
-feh --bg-fill ~/.config/assets/bg11.png
+feh --bg-fill ~/.config/assets/bg1.jpg
