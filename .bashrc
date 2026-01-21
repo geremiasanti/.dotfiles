@@ -156,7 +156,7 @@ alias tl="tmux ls"
 alias ta="tmux a"
 alias tk="tmux kill-server"
 # setup specific session
-alias sct="setup-ct"
+alias tsc="setup-ct"
 
 # git
 alias gl="git log --oneline --graph --decorate --all"
