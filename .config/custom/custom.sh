@@ -20,24 +20,22 @@ function setup-ct() {
 	local session="CardTrader"
 	local root=~/dev/CardTrader
 
-	# Create session detached, starting at root
 	tmux new-session -d -s "$session" -c "$root"
 
-	# Window 0: rails server
 	tmux new-window -t "$session":0 -n 'rails' -c "$root"
 	tmux send-keys  -t "$session":0 "rails s" C-m
 
-	# Window 1: sidekiq 
 	tmux new-window -t "$session":1 -n 'sidekiq' -c "$root"
 	tmux send-keys  -t "$session":1 "bundle exec sidekiq" C-m
 
-	# Window 2: 
 	tmux new-window -t "$session":2 -n 'ngrok'
 	tmux send-keys  -t "$session":2 "ngrok http 3000" C-m
 
 	# Window 3: temp dir, nvim tempp.txt
-	tmux send-keys -t "$session":3 "cd ~/temp" C-m
+	tmux new-window -t "$session":3 -n 'temp' -c ~/temp
+	tmux send-keys  -t "$session":3 "nvim tempp.txt" C-m
 
-	# Attach to session
+	# Attach to session on first page
+	tmux select-window -t "$session":0
 	tmux attach-session -t "$session"
 }
