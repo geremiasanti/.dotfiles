@@ -7,6 +7,7 @@
 
 # unignore configuration files
 !.bashrc
+!.gitconfig
 !.tmux.conf
 !.config/
 !.config/nvim/
