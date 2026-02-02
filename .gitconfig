@@ -1,0 +1,18 @@
+[user]
+	email = geremiasanti.dev@gmail.com
+	name = Geremia Santi
+[credential]
+	credentialStore = gpg
+	helper = 
+	helper = /usr/local/bin/git-credential-manager
+[credential "https://dev.azure.com"]
+	useHttpPath = true
+[init]
+	defaultBranch = main
+[merge]
+	tool = vimdiff
+[pager]
+	diff = nvim -R
+[color]
+	pager = false
+	diff = auto
