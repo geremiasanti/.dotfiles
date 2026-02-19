@@ -11,8 +11,3 @@
 	defaultBranch = main
 [merge]
 	tool = vimdiff
-[pager]
-	diff = nvim -R
-[color]
-	pager = false
-	diff = auto
