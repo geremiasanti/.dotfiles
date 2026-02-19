@@ -23,7 +23,7 @@ function setup-ct() {
 	tmux new-session -d -s "$session" -c "$root"
 
 	tmux new-window -t "$session":0 -n 'rails' -c "$root"
-	tmux send-keys  -t "$session":0 "rails s" C-m
+	tmux send-keys  -t "$session":0 "rails s -b 0.0.0.0" C-m
 
 	tmux new-window -t "$session":1 -n 'sidekiq' -c "$root"
 	tmux send-keys  -t "$session":1 "bundle exec sidekiq" C-m
