@@ -23,3 +23,5 @@
 !.config/picom/**
 !.config/assets/
 !.config/assets/**
+!.claude/
+!.claude/settings.json
