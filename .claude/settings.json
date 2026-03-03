@@ -1,0 +1,23 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(git add:*)",
+      "Bash(git commit:*)",
+      "Bash(git status:*)",
+      "Bash(git diff:*)",
+      "Bash(git log:*)",
+      "Bash(git branch:*)",
+      "Bash(git stash:*)",
+      "Bash(bundle exec rubocop:*)",
+      "Bash(bin/rails:*)",
+      "Bash(npx eslint:*)",
+      "Bash(i18n-tasks:*)",
+      "Bash(gh pr view:*)",
+      "Bash(gh pr list:*)",
+      "Bash(gh issue view:*)",
+      "Bash(gh issue list:*)",
+      "Bash(gh api:repos/*/pulls/*/comments)",
+      "Bash(cat:*)"
+    ]
+  }
+}
