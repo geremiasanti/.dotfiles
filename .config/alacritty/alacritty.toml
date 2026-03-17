@@ -45,7 +45,7 @@ import = [
 command = { program = "/home/geremia/.config/custom/nvim-open.sh" }
 hyperlinks = false
 post_processing = true
-regex = "(/?[\\w.+-]+/)*[\\w.+-]+\\.\\w+(:\\d+)?"
+regex = "/?[\\w.+-]+(/[\\w.+-]+)+(:\\d+)?"
 binding = { key = "O", mods = "Control|Shift" }
 
 [colors.primary]
