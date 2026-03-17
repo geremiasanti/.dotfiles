@@ -58,8 +58,7 @@ vim.opt.listchars = {
 -- Avvia server socket per ricevere --remote da altri processi
 -- Solo se non siamo già dentro un nvim annidato (es. :terminal)
 if not vim.env.NVIM then
-  vim.fn.delete('/tmp/nvim.sock')
-  vim.fn.serverstart('/tmp/nvim.sock')
+  vim.fn.serverstart('/tmp/nvim-' .. vim.fn.getpid() .. '.sock')
 end
 
 -- Override highlights after any colorscheme is loaded

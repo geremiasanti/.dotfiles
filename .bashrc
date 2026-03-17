@@ -137,6 +137,9 @@ PROMPT_COMMAND='
   fi
 '
 
+# salva cwd per nvim-open.sh (hint alacritty)
+PROMPT_COMMAND+='pwd > /tmp/shell-cwd'
+
 # PS1='${debian_chroot:+($debian_chroot)}\[\033[01;32m\]\u@\h\[\033[00m\]:\[\033[01;34m\]\w\[\033[00m\]\$ '
 # PS1='\[\e[35;1m\]\w\[\e[0m\]\[\e[36;1m\]${PS1_CMD1}\[\e[0m\]\n\[\e[32;1m\]$ \[\e[0m\]'
 PS1='\[\e[32;1m\][\[\e[35;1m\]\w\[\e[0m\]\[\e[32;1m\]${OPTIONAL_SEPARATOR}\[\e[0m\]\[\e[36;1m\]${PS1_CMD1}\[\e[0m\]\[\e[32;1m\]]\n\[\e[32;1m\]$ \[\e[0m\]'
