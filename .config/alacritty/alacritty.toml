@@ -41,5 +41,12 @@ import = [
     "~/.config/alacritty/themes/themes/github_dark.toml"
 ]
 
+[[hints.enabled]]
+command = { program = "/home/geremia/.config/custom/nvim-open.sh" }
+hyperlinks = false
+post_processing = true
+regex = "(/?[\\w.+-]+/)*[\\w.+-]+\\.\\w+(:\\d+)?"
+binding = { key = "O", mods = "Control|Shift" }
+
 [colors.primary]
 background = "0x22272e"
