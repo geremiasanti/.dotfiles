@@ -27,5 +27,3 @@
 !.claude/settings.json
 !.codex/
 !.codex/config.toml
-!.codex/rules/
-!.codex/rules/default.rules
