@@ -1,0 +1,14 @@
+model = "gpt-5.4"
+sandbox_mode = "workspace-write"
+ask_for_approval = "on-request"
+[projects."/home/geremia"]
+trust_level = "trusted"
+
+[projects."/home/geremia/dev/CardTrader"]
+trust_level = "trusted"
+
+[projects."/home/geremia/.config/nvim"]
+trust_level = "trusted"
+
+[notice.model_migrations]
+"gpt-5.3-codex" = "gpt-5.4"
