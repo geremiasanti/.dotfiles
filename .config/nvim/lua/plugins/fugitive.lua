@@ -1,8 +1,18 @@
 return { 
   'tpope/vim-fugitive',
   config = function()
-    vim.keymap.set('n', '<leader>g', function()
+    -- Cap fugitive window height to 12 lines whenever it opens
+    vim.api.nvim_create_autocmd('FileType', {
+      pattern = 'fugitive',
+      callback = function()
+        local max = 12
+        if vim.api.nvim_win_get_height(0) > max then
+          vim.api.nvim_win_set_height(0, max)
+        end
+      end,
+    })
 
+    vim.keymap.set('n', '<leader>g', function()
       -- If fugitive or git windows already visible, close the windows
       local closed_something = false
       for _, win in ipairs(vim.api.nvim_list_wins()) do
@@ -14,9 +24,9 @@ return {
         end
       end
 
-      -- If no fugitive window is visible, and closed, open it and resize
+      -- If no fugitive window is visible, open it
       if not closed_something then
-        vim.cmd 'G | resize 12'
+        vim.cmd 'G'
       end
     end, { noremap = true, silent = true })
   end
