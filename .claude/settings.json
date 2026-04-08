@@ -19,5 +19,6 @@
       "Bash(gh api:repos/*/pulls/*/comments)",
       "Bash(cat:*)"
     ]
-  }
+  },
+  "skipDangerousModePermissionPrompt": true
 }
