@@ -9,6 +9,18 @@ return {
         if vim.api.nvim_win_get_height(0) > max then
           vim.api.nvim_win_set_height(0, max)
         end
+
+        -- dd: open diff and close the fugitive window for max height
+        vim.keymap.set('n', 'dd', function()
+          local fugitive_win = vim.api.nvim_get_current_win()
+          local keys = vim.api.nvim_replace_termcodes('<Plug>fugitive:dd', true, true, true)
+          vim.api.nvim_feedkeys(keys, 'x', false)
+          vim.schedule(function()
+            if vim.api.nvim_win_is_valid(fugitive_win) then
+              vim.api.nvim_win_close(fugitive_win, true)
+            end
+          end)
+        end, { buffer = true })
       end,
     })
 
