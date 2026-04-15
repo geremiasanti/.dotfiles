@@ -176,5 +176,9 @@ alias rc="rails c"
 # nvim
 alias vi="nvim"
 
+# claude code
+alias cc="claude"
+alias cc_yolo="claude --dangerously-skip-permissions"
+
 # untracked (only for current machine)
 source ~/.config/custom/local.sh
