@@ -116,8 +116,9 @@ if ! shopt -oq posix; then
   fi
 fi
 
-# Added by `rbenv init` on Mon Nov  4 02:00:21 PM CET 2024
+# Version managers
 eval "$(~/.rbenv/bin/rbenv init - --no-rehash bash)"
+eval "$(/home/geremia/.local/bin/mise activate bash)"
 
 export NVM_DIR="$HOME/.nvm"
 [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
