@@ -10,6 +10,9 @@ trust_level = "trusted"
 [projects."/home/geremia/.config/nvim"]
 trust_level = "trusted"
 
+[projects."/home/geremia/dev"]
+trust_level = "trusted"
+
 [notice.model_migrations]
 "gpt-5.3-codex" = "gpt-5.4"
 

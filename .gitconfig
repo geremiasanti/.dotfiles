@@ -11,3 +11,5 @@
 	defaultBranch = main
 [merge]
 	tool = vimdiff
+[core]
+	excludesFile = /home/geremia/.gitignore_global
