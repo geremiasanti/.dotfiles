@@ -177,9 +177,10 @@ alias rc="rails c"
 # nvim
 alias vi="nvim"
 
-# claude code
-alias cc="claude"
-alias cc_yolo="claude --dangerously-skip-permissions"
+# llm
+alias cc="codex"
+alias cc_yolo="codex --full-auto"
+alias cc_disaster="codex --dangerously-bypass-approvals-and-sandbox"
 
 # untracked (only for current machine)
 source ~/.config/custom/local.sh
