@@ -184,3 +184,8 @@ alias cc_disaster="codex --dangerously-bypass-approvals-and-sandbox"
 
 # untracked (only for current machine)
 source ~/.config/custom/local.sh
+# Docker Desktop socket for Docker SDK-based tools
+if [ -z "${DOCKER_HOST:-}" ]; then
+  export DOCKER_HOST="unix:///home/geremia/.docker/desktop/docker.sock"
+fi
+
