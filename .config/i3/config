@@ -42,6 +42,9 @@ exec --no-startup-id dex --autostart --environment i3
 # screen before suspend. Use loginctl lock-session to lock your screen.
 exec --no-startup-id xss-lock --transfer-sleep-lock -- i3lock --nofork
 
+# Disable screen blanking and DPMS power management (monitor never turns off)
+exec_always --no-startup-id xset s off -dpms s noblank
+
 # NetworkManager is the most popular way to manage wireless networks on Linux,
 # and nm-applet is a desktop environment-independent system tray GUI for it.
 exec --no-startup-id nm-applet
@@ -191,6 +194,8 @@ mode "audio" {
     bindsym Up exec --no-startup-id sh -c 'amixer set Master 5%+ && vol=$(amixer get Master | grep -o "[0-9]*%" | head -1) && notify-send "Volume: $vol" && aplay /usr/share/sounds/sound-icons/capital'
     # toggle
     bindsym Tab exec --no-startup-id sh -c 'amixer set Master toggle && state=$(amixer get Master | grep -o "\\[on\\]\\|\\[off\\]" | head -1) && vol=$(amixer get Master | grep -o "[0-9]*%" | head -1) && notify-send "Audio: $state ($vol)" && aplay /usr/share/sounds/sound-icons/capital'
+    # cycle soundcore earbuds ambient sound mode (NoiseCanceling -> Transparency -> Normal)
+    bindsym m exec --no-startup-id ~/.local/bin/soundcore-anc-cycle
 
     # back to normal: Enter or Escape or $mod+a
     bindsym Return mode "default"
@@ -198,6 +203,11 @@ mode "audio" {
     bindsym $mod+a mode "default"
 }
 bindsym $mod+a mode "audio"
+
+# multimedia keys (work without entering the audio mode)
+bindsym XF86AudioLowerVolume exec --no-startup-id sh -c 'amixer set Master 5%- && vol=$(amixer get Master | grep -o "[0-9]*%" | head -1) && notify-send "Volume: $vol" && aplay /usr/share/sounds/sound-icons/capital'
+bindsym XF86AudioRaiseVolume exec --no-startup-id sh -c 'amixer set Master 5%+ && vol=$(amixer get Master | grep -o "[0-9]*%" | head -1) && notify-send "Volume: $vol" && aplay /usr/share/sounds/sound-icons/capital'
+bindsym XF86AudioMute exec --no-startup-id sh -c 'amixer set Master toggle && state=$(amixer get Master | grep -o "\\[on\\]\\|\\[off\\]" | head -1) && vol=$(amixer get Master | grep -o "[0-9]*%" | head -1) && notify-send "Audio: $state ($vol)" && aplay /usr/share/sounds/sound-icons/capital'
 
 # # default border width
 default_border pixel 3
