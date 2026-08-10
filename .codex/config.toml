@@ -1,7 +1,7 @@
 model = "gpt-5.5"
 sandbox_mode = "workspace-write"
 ask_for_approval = "on-request"
-model_reasoning_effort = "high"
+model_reasoning_effort = "xhigh"
 personality = "pragmatic"
 [projects."/home/geremia"]
 trust_level = "trusted"
@@ -32,3 +32,6 @@ enabled = true
 
 [tui.model_availability_nux]
 "gpt-5.5" = 4
+
+[mcp_servers.sentry]
+url = "https://mcp.sentry.dev/mcp"
