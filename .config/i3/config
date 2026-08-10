@@ -195,7 +195,7 @@ mode "audio" {
     # toggle
     bindsym Tab exec --no-startup-id sh -c 'amixer set Master toggle && state=$(amixer get Master | grep -o "\\[on\\]\\|\\[off\\]" | head -1) && vol=$(amixer get Master | grep -o "[0-9]*%" | head -1) && notify-send "Audio: $state ($vol)" && aplay /usr/share/sounds/sound-icons/capital'
     # cycle soundcore earbuds ambient sound mode (NoiseCanceling -> Transparency -> Normal)
-    bindsym m exec --no-startup-id ~/.local/bin/soundcore-anc-cycle
+    bindsym m exec --no-startup-id ~/.config/custom/soundcore-anc-cycle.sh
 
     # back to normal: Enter or Escape or $mod+a
     bindsym Return mode "default"
