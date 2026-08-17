@@ -49,6 +49,11 @@ exec_always --no-startup-id xset s off -dpms s noblank
 # and nm-applet is a desktop environment-independent system tray GUI for it.
 exec --no-startup-id nm-applet
 
+# Clipboard manager: takes ownership of the clipboard right after each copy,
+# so pastes never depend on the (possibly frozen) source app answering — see
+# X11 delayed rendering hangs when pasting from Chromium/Electron apps.
+exec --no-startup-id copyq
+
 # Use Mouse+$mod to drag floating windows to their wanted position
 floating_modifier $mod
 
