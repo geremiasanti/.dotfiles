@@ -118,7 +118,7 @@ fi
 
 # Version managers
 eval "$(~/.rbenv/bin/rbenv init - --no-rehash bash)"
-eval "$(/home/geremia/.local/bin/mise activate bash)"
+command -v mise >/dev/null 2>&1 && eval "$(mise activate bash)"
 
 export NVM_DIR="$HOME/.nvm"
 [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
@@ -144,11 +144,6 @@ PROMPT_COMMAND+='pwd > /tmp/shell-cwd'
 # PS1='${debian_chroot:+($debian_chroot)}\[\033[01;32m\]\u@\h\[\033[00m\]:\[\033[01;34m\]\w\[\033[00m\]\$ '
 # PS1='\[\e[35;1m\]\w\[\e[0m\]\[\e[36;1m\]${PS1_CMD1}\[\e[0m\]\n\[\e[32;1m\]$ \[\e[0m\]'
 PS1='\[\e[32;1m\][\[\e[35;1m\]\w\[\e[0m\]\[\e[32;1m\]${OPTIONAL_SEPARATOR}\[\e[0m\]\[\e[36;1m\]${PS1_CMD1}\[\e[0m\]\[\e[32;1m\]]\n\[\e[32;1m\]$ \[\e[0m\]'
-
-# NVM
-export NVM_DIR="$HOME/.nvm"
-[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
-[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
 
 # CUSTOM COMMANDS
 
@@ -188,4 +183,3 @@ source ~/.config/custom/local.sh
 if [ -z "${DOCKER_HOST:-}" ]; then
   export DOCKER_HOST="unix:///home/geremia/.docker/desktop/docker.sock"
 fi
-

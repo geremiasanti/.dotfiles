@@ -50,3 +50,8 @@ binding = { key = "O", mods = "Control|Shift" }
 
 [colors.primary]
 background = "0x22272e"
+
+[[keyboard.bindings]]
+key = "Return"
+mods = "Shift"
+chars = "\u001B\r"
