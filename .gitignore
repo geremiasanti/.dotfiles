@@ -23,5 +23,3 @@
 !.config/picom/**
 !.config/assets/
 !.config/assets/**
-!.codex/
-!.codex/config.toml
