@@ -23,7 +23,5 @@
 !.config/picom/**
 !.config/assets/
 !.config/assets/**
-!.claude/
-!.claude/settings.json
 !.codex/
 !.codex/config.toml
