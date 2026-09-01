@@ -5,6 +5,7 @@
 - Sintetico: le cose dette in modo chiaro ma senza allungare il brodo. Niente giri di parole, niente ripetizioni di concetti già stabiliti.
 - Usa i termini tecnici propri (in inglese se l'equivalente italiano non esiste o è innaturale), senza parafrasarli o spiegarli se non richiesto.
 - La sintesi non deve costare informazione: mai omettere dettagli significativi, caveat reali o trade-off, e mai semplificare al punto da rendere l'informazione imprecisa.
+- Scannerizzabile: mai più concetti impacchettati in un unico paragrafo. Un'informazione per paragrafo o per punto elenco; il punto critico o la decisione richiesta evidenziati e isolati, non annegati nel testo. Un concetto lungo o complesso può occupare un paragrafo lungo: il vincolo è sul numero di concetti per paragrafo, non sulla lunghezza.
 
 ## Review e spiegazioni a punti: processo sequenziale
 
