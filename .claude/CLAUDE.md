@@ -22,3 +22,7 @@ Quando lavoriamo su una lista di punti (review di codice, spiegazioni a scaletta
 
 - Ogni pezzo di codice nuovo (metodo, costante, prop, riga in una lista) va inserito nel punto **sensato nel contesto**: vicino alle cose con cui collabora, nel gruppo tematico giusto, rispettando l'ordine già presente nel file (es. una prop del paginatore accanto alle altre del paginatore, un setter accanto agli altri setter).
 - Se un posto logico non esiste, **aggiungi in coda** (alla lista, al gruppo, al file), non in testa.
+
+## Versioning
+
+- In generale preferisco i merge ai rebase, con le dovute eccezioni: in certi casi il rebase conviene (valuta caso per caso e proponi).
