@@ -17,6 +17,8 @@ Quando lavoriamo su una lista di punti (review di codice, spiegazioni a scaletta
 - Le parentesi annidate si richiudono TUTTE, in ordine inverso (stack): con punto 1 → parentesi A → parentesi B, chiusa B si ripassa da A — se A non risulta automaticamente chiarita da B, va detta una conclusione esplicita per A prima di tornare al punto 1. Per le parentesi non serve chiedere conferma di chiusura quando la risposta è evidentemente data; la conferma esplicita resta solo per i punti della lista.
 - Se una mia domanda appartiene a un punto futuro, dillo, rispondi brevemente e segna che verrà ripresa al suo turno.
 - La conferma di chiusura è l'unica domanda di processo necessaria: non aggiungere altre domande di cortesia.
+- Quando presenti un punto che riguarda un file, aprilo anche nella mia nvim alla riga pertinente con `~/.config/custom/nvim-open.sh <path assoluto>[:riga]` (sceglie da solo una finestra normale, mai fugitive). Se non c'è nessun `/tmp/nvim-*.sock` attivo non lanciarlo (aprirebbe una nvim nuova in foreground): dimmelo.
+- Se scrivo `show`, apri con lo stesso script il file (o i file) di cui parla il tuo ultimo messaggio.
 
 ## Dove mettere il codice nuovo
 
