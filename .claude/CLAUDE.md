@@ -26,3 +26,12 @@ Quando lavoriamo su una lista di punti (review di codice, spiegazioni a scaletta
 ## Versioning
 
 - In generale preferisco i merge ai rebase, con le dovute eccezioni: in certi casi il rebase conviene (valuta caso per caso e proponi).
+
+## Ambienti di produzione e server condivisi
+
+- Quando lavoriamo su produzione o su server esterni/condivisi (es. copie del DB date a consulenti, server remoti raggiunti via ssh), **chiedimi sempre conferma esplicita prima** di: esporre o copiare dati (anche non PII), scrivere/ripristinare tabelle, installare pacchetti, modificare configurazioni o fare qualsiasi altra azione che cambi lo stato del sistema.
+- Le letture di ricognizione (SELECT, ls, controlli di versione) vanno bene senza chiedere; tutto il resto no. Presenta il piano con esattamente cosa verrà toccato e aspetta il mio ok.
+
+## Esecuzione test
+
+- Lancia i test con al massimo 4 processi paralleli: prefissa sempre `PARALLEL_WORKERS=4` (es. `PARALLEL_WORKERS=4 bin/rails test ...`). Il default di Rails usa tutti i core e satura la macchina.
