@@ -28,6 +28,9 @@ Quando lavoriamo su una lista di punti (review di codice, spiegazioni a scaletta
 ## Versioning
 
 - In generale preferisco i merge ai rebase, con le dovute eccezioni: in certi casi il rebase conviene (valuta caso per caso e proponi).
+- **Mai riscrivere la history**: niente `--amend`, `reset` di commit già fatti, rebase interattivi, squash o `push --force` (nemmeno `--force-with-lease`), su nessun branch. Non mi interessa una history pulita.
+- Ogni correzione è un **commit normale in avanti** seguito da un push normale. Per spostare modifiche da un branch all'altro: un commit che le toglie nel primo, un commit che le aggiunge nel secondo.
+- Se una riscrittura sembra l'unica strada, fermati e chiedi: non proporla come default.
 
 ## Ambienti di produzione e server condivisi
 
@@ -36,4 +39,4 @@ Quando lavoriamo su una lista di punti (review di codice, spiegazioni a scaletta
 
 ## Esecuzione test
 
-- Lancia i test con al massimo 4 processi paralleli: prefissa sempre `PARALLEL_WORKERS=4` (es. `PARALLEL_WORKERS=4 bin/rails test ...`). Il default di Rails usa tutti i core e satura la macchina.
+- Lancia i test con al massimo 3 processi paralleli: prefissa sempre `PARALLEL_WORKERS=3` (es. `PARALLEL_WORKERS=3 bin/rails test ...`). Il default di Rails usa tutti i core e satura la macchina; anche 4 la rende lenta mentre ci lavoro.
