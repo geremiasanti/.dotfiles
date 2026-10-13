@@ -63,3 +63,18 @@
 - Mantieni la whitelist: abilita soltanto i singoli file concordati, senza includere intere directory.
 - Escludi credenziali, token, chiavi private e altri dati riservati. Controlla il contenuto prima di aggiungerlo a Git.
 - Chiedi il consenso prima di commit o push, salvo che siano già autorizzati nella richiesta corrente.
+
+## Workflow locale — solo CardTrader
+
+Queste regole valgono esclusivamente per CardTrader e i suoi worktree, non per gli altri progetti.
+
+- La directory `/home/geremia/dev/CardTrader` è quella del server development e della review manuale. Sviluppa e testa in un worktree esterno, senza modificarla durante il lavoro.
+- Riusa il worktree per tutta la durata del task: non ricrearlo a ogni modifica. Quello del task outbound è `/home/geremia/dev/CardTrader-codex-outbound`, sul branch `codex/outbound-mini-hub-shipments`, derivato da `outbound-mini-hub-shipments`. Per altri task, crea un worktree esterno e un branch distinto dal branch reviewato, dopo aver controllato `git worktree list` e lo stato Git.
+- I file locali necessari sono `config/database.yml`, `config/elasticsearch.yml`, `config/redis.yml` e `config/master.key`: crea nel worktree symlink ai corrispondenti file della directory development, se mancanti. Non modificarli tramite i link, non stampare credenziali e non copiarli in Git.
+- Puoi collegare `node_modules` dalla directory development solo se `package.json` e `yarn.lock` coincidono. Se cambiano le dipendenze, usa un'installazione separata. Le gemme già installate sono riutilizzabili dopo `bundle check`.
+- Mantieni separati `tmp`, `log`, cache degli assets, upload, chiavi JWT generate dai test e altri file generati. Non collegare queste directory a quelle development. Il primo run può ricompilare gli assets; conserva la cache per i run successivi.
+- Prima dei test, verifica senza esporre segreti che la configurazione `test` punti a MySQL locale: database `cardtrader_test`, socket `/run/mysqld/mysqld.sock`, con i database dei worker derivati dal nome di test. Ricontrolla se la configurazione cambia. Non eseguire migrazioni o comandi development come parte del setup dei test.
+- Esegui una sola suite alla volta: i worktree condividono i servizi locali, i database e gli indici di test. Usa `RAILS_ENV=test PARALLEL_WORKERS=3 flock -n /tmp/cardtrader-test-suite.lock nice -n 10 ionice -c 2 -n 7 bin/rails test <file> --verbose`. Se il lock è occupato, non avviare un'altra suite e non interrompere processi altrui. Verifica anche eventuali run avviati senza lock.
+- Esegui il lint a priorità ridotta: `nice -n 10 ionice -c 2 -n 7 bundle exec rubocop -a --cache false <file.rb>`; per JS usa il binario ESLint installato con `--fix`. Non editare i file del worktree mentre vengono testati.
+- Trasferisci nella directory development solo modifiche complete, con lint e test pertinenti riusciti. Un'anteprima non ancora verificata richiede una richiesta esplicita. Prima di trasferire, controlla branch, diff e modifiche dell'utente; non sovrascrivere modifiche sovrapposte.
+- Per trasferire commit autorizzati usa un merge, con directory di destinazione pulita. Per modifiche richieste unstaged, applica una patch della versione verificata, dopo `git apply --check`. Verifica che la versione trasferita coincida con quella testata. Commit e push restano soggetti alle autorizzazioni già definite; migrazioni e modifiche al database richiedono un passaggio separato.
