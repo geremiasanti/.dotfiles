@@ -13,7 +13,10 @@
 !.config/nvim/
 !.config/nvim/**
 !.config/alacritty/
-!.config/alacritty/**
+!.config/alacritty/alacritty.toml
+!.config/alacritty/themes/
+!.config/alacritty/themes/themes/
+!.config/alacritty/themes/themes/github_dark.toml
 !.config/i3/
 !.config/i3/**
 !.config/custom/
