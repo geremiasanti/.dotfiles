@@ -48,6 +48,14 @@
 
 - Usa al massimo 3 processi paralleli. Per i test Rails, prefissa sempre `PARALLEL_WORKERS=3`, ad esempio `PARALLEL_WORKERS=3 bin/rails test ...`, per lasciare la macchina utilizzabile mentre lavoro.
 
+## Verifiche visive delle pagine web
+
+- Quando è necessario vedere una pagina o verificare il layout, riproducila nel browser dei test e acquisisci direttamente uno screenshot, senza chiedermi di farlo se puoi riprodurla autonomamente.
+- Nei progetti Rails con Capybara, usa un test system mirato: prepara i dati con le factory, autentica l'utente necessario, esegui `visit` con il route helper e poi `page.save_screenshot('/tmp/pagina.png', full: true)`.
+- Apri lo screenshot con lo strumento di visualizzazione immagini e controlla il risultato prima di modificare il CSS. Non usare screenshot del desktop come prima scelta per verificare una pagina web.
+- Parti dalla verifica visiva; misura posizioni e dimensioni nel DOM solo se serve per diagnosticare il problema o scrivere un test di regressione.
+- Prima del commit, rimuovi il salvataggio degli screenshot e il codice diagnostico temporaneo. Mantieni un test di regressione solo se verifica un comportamento utile.
+
 ## Configurazioni personali
 
 - Il repository dotfiles è un repository Git bare in `~/.dotfiles`, con working tree nella home. La bashrc definisce l'alias `dotfiles`.
