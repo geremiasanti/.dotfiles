@@ -8,6 +8,7 @@ import json
 import os
 from pathlib import Path
 import pty
+import re
 import selectors
 import shlex
 import shutil
@@ -144,6 +145,66 @@ def write_record(directory, record):
     temporary.replace(directory / "state.json")
 
 
+def command_category(command, label=''):
+    try:
+        words = shlex.split(command, comments=True) if isinstance(command, str) else list(command)
+        while words and Path(words[0]).name in ('bash', 'sh', 'zsh', 'fish'):
+            option = next((index for index, word in enumerate(words)
+                           if word.startswith('-') and 'c' in word), None)
+            if option is None or option + 1 >= len(words):
+                break
+            words = shlex.split(words[option + 1], comments=True)
+    except ValueError:
+        return ''
+    names = [Path(word).name for word in words]
+    if ('rails' in names and 'test' in words or
+            any(name in names for name in ('pytest', 'unittest', 'rspec', 'jest', 'vitest')) or
+            any(name.endswith(('_test.py', '_test.rb', '.test.js', '.test.ts')) for name in names)):
+        return 'TEST'
+    if any(name in names for name in ('rubocop', 'eslint', 'ruff', 'flake8', 'pylint', 'prettier', 'py_compile', 'json.tool')):
+        return 'LINT'
+    if 'git' in names:
+        return 'GIT'
+    if any(name in names for name in ('mysql', 'mysqladmin', 'psql', 'sqlite3', 'redis-cli')) or (
+            'rails' in names and any(word.startswith('db:') for word in words)):
+        return 'DB'
+    if any(name in names for name in ('apply_patch', 'patch', 'cp', 'mv', 'rm', 'mkdir', 'touch', 'chmod', 'chown', 'tee')) or (
+            'sed' in names and any(word == '--in-place' or word.startswith('-i') for word in words)):
+        return 'EDIT'
+    if any(name in names for name in ('rg', 'grep', 'sed', 'cat', 'head', 'tail', 'ls', 'find', 'stat',
+                                     'readlink', 'findmnt', 'pgrep', 'ps', 'which', 'wc', 'du', 'file')):
+        return 'READ'
+    if label.startswith(('test-', 'test_')):
+        return 'TEST'
+    languages = {'node': 'js', 'ruby': 'rb', 'bash': 'sh', 'sh': 'sh', 'zsh': 'sh', 'fish': 'fish'}
+    for name in names:
+        if re.fullmatch(r'python[\d.]*', name):
+            return 'RUN:py'
+        if name in languages:
+            return f'RUN:{languages[name]}'
+        if Path(name).suffix in ('.py', '.js', '.ts', '.rb', '.sh'):
+            return f'RUN:{Path(name).suffix[1:]}'
+    return ''
+
+
+def task_category(job):
+    category = job.get('category')
+    if category is None or category == 'RUN':
+        return command_category(job.get('command', ''), job['label'])
+    return category
+
+
+def task_code(job):
+    category = task_category(job)
+    if category.startswith('RUN:'):
+        category = 'R:' + category[4:6]
+    return f'[{category[:4]:4}]'
+
+
+def task_title(job):
+    return f'{task_code(job)} {job["label"]}'
+
+
 def records():
     jobs = sorted(
         (json.loads(path.read_text()) for path in STATE_DIR.glob("*/state.json")),
@@ -204,7 +265,7 @@ def status(compact=False):
             label = job['label'].replace('\n', '\\n').replace('\r', '\\r').replace('\t', '\\t')
             if len(label) > operation_width:
                 label = label[:operation_width - 1] + '…'
-            return label
+            return f'{task_code(job)} {label:{operation_width}}'
 
         colors = {0: 90}
         color_starts = {0: 8}
@@ -213,7 +274,7 @@ def status(compact=False):
         for job in active[:active_limit]:
             duration = now - job["started"]
             colors[len(lines)] = 36
-            lines.append(f"{operation_label(job):{operation_width}} {duration:6.1f}s")
+            lines.append(f"{operation_label(job)} {duration:6.1f}s")
             lines.append(f"  {job['command']}")
         if len(active) > active_limit:
             lines.append(f"+ {len(active) - active_limit} more running")
@@ -231,7 +292,7 @@ def status(compact=False):
             result = str(exit_code) if exit_code is not None else '-'
             colors[len(lines)] = completed_color(job, now)
             label = operation_label(job)
-            lines.append(f"{label:{operation_width}} {duration:6.1f}s  {result:>4}")
+            lines.append(f"{label} {duration:6.1f}s  {result:>4}")
         if len(recent) > recent_limit:
             lines.append("...")
         if not recent:
@@ -250,7 +311,7 @@ def status(compact=False):
         duration = (job.get("finished") or now) - job["started"]
         exit_code = "" if job.get("exit_code") is None else f" | exit {job['exit_code']}"
         display(f"{state:11} {time.strftime('%H:%M:%S', time.localtime(job['started']))} "
-                f"{duration:6.1f}s | {job['label']}{exit_code}")
+                f"{duration:6.1f}s | {task_title(job)}{exit_code}")
         display(f"  {job['cwd']}")
         display(f"  $ {job['command']}")
         display(f"  log: {job['id']}/output.log")
@@ -273,7 +334,7 @@ def watch():
                     remove_task_pane(host_panes.pop(job_id))
             for job_id, job in running.items():
                 if job_id not in host_panes and time.time() - job['started'] > 1:
-                    pane = add_task_pane(job['label'], STATE_DIR / job_id / 'output.log')
+                    pane = add_task_pane(task_title(job), STATE_DIR / job_id / 'output.log')
                     tmux('set-option', '-p', '-t', pane, '@monitor-job', job_id)
                     host_panes[job_id] = pane
             if time.monotonic() >= next_reflow:
@@ -378,13 +439,14 @@ def run_command(args):
         "command": shlex.join(command), "pid": os.getpid(), "started": time.time(),
         "status": "RUNNING", "exit_code": None,
         "host_ui": args.host_ui,
+        "category": command_category(command, args.label),
     }
     write_record(directory, record)
     pane_id = None
     process = None
     master = None
     exit_code = 1
-    header = f"[{record['id']}] {args.label}\n{record['cwd']}\n$ {record['command']}\n\n"
+    header = f"[{record['id']}] {task_title(record)}\n{record['cwd']}\n$ {record['command']}\n\n"
     try:
         with (directory / "output.log").open("ab", buffering=0) as log:
             log.write(header.encode())
@@ -400,7 +462,7 @@ def run_command(args):
                 selector.register(master, selectors.EVENT_READ)
                 while True:
                     if not args.host_ui and pane_id is None and time.monotonic() - started > 1 and process.poll() is None:
-                        pane_id = add_task_pane(args.label, directory / "output.log")
+                        pane_id = add_task_pane(task_title(record), directory / "output.log")
                     for _key, _events in selector.select(timeout=0.1):
                         try:
                             output = os.read(master, 65536)

@@ -55,7 +55,9 @@ def rewrite(event, workspaces):
     command = tool_input.get('command')
     if not isinstance(command, str) or not command.strip():
         return {}
-    if command.lstrip().startswith('# agent-monitor: off') or str(MONITOR) in command:
+    description = re.match(r'\A[ \t]*# agent-monitor:[ \t]*([^\r\n]*)', command.lstrip())
+    label = description[1].strip() if description else ''
+    if label == 'off' or str(MONITOR) in command:
         return {}
     # Sensitive output still requires the explicit opt-out; these exclusions cover known local sources.
     if any(value in command for value in ('database.yml', 'master.key', 'auth.json', '.ssh/', '.env',
@@ -67,7 +69,7 @@ def rewrite(event, workspaces):
             return {}
         if re.search(r'\brails\s+(console|c|dbconsole)\b', command):
             return {}
-        label = operation_name(command)
+        label = label or operation_name(command)
     except ValueError:
         return {}
     shell = os.environ.get('SHELL', '/bin/bash')

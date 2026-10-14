@@ -31,3 +31,4 @@
 !.codex/
 .codex/*
 !.codex/AGENTS.md
+!.codex/hooks.json
