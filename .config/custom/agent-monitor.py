@@ -233,6 +233,7 @@ def status(compact=False):
 
 def watch():
     try:
+        print("\033[?25l", end="", flush=True)
         while True:
             reflow()
             print("\033[H\033[2J", end="")
@@ -241,6 +242,8 @@ def watch():
             time.sleep(1)
     except KeyboardInterrupt:
         pass
+    finally:
+        print("\033[?25h", end="", flush=True)
 
 
 def containers(tree):
