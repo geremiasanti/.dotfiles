@@ -2,6 +2,7 @@
 """Prototype: insert command monitoring through a Codex PreToolUse hook."""
 
 import argparse
+import importlib.util
 import json
 import os
 from pathlib import Path
@@ -89,7 +90,18 @@ def main():
     parser.add_argument('--workspace', action='append')
     args = parser.parse_args()
     event = json.load(sys.stdin)
-    print(json.dumps(rewrite(event, args.workspace or WORKSPACES)))
+    workspaces = args.workspace or WORKSPACES
+    if event['hook_event_name'] in ('UserPromptSubmit', 'Stop', 'Interrupt', 'SessionEnd'):
+        cwd = Path(event['cwd']).resolve()
+        if any(cwd.is_relative_to(Path(workspace).resolve()) for workspace in workspaces):
+            os.umask(0o077)
+            spec = importlib.util.spec_from_file_location('agent_monitor', MONITOR)
+            monitor = importlib.util.module_from_spec(spec)
+            spec.loader.exec_module(monitor)
+            monitor.record_turn(event)
+        print('{}')
+    else:
+        print(json.dumps(rewrite(event, workspaces)))
 
 
 if __name__ == '__main__':

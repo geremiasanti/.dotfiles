@@ -11,6 +11,18 @@
           }
         ]
       }
+    ],
+    "UserPromptSubmit": [
+      {"hooks": [{"type": "command", "command": "python3 /home/geremia/.config/custom/agent-monitor-hook.py", "timeout": 3}]}
+    ],
+    "Stop": [
+      {"hooks": [{"type": "command", "command": "python3 /home/geremia/.config/custom/agent-monitor-hook.py", "timeout": 3}]}
+    ],
+    "Interrupt": [
+      {"hooks": [{"type": "command", "command": "python3 /home/geremia/.config/custom/agent-monitor-hook.py", "timeout": 3}]}
+    ],
+    "SessionEnd": [
+      {"hooks": [{"type": "command", "command": "python3 /home/geremia/.config/custom/agent-monitor-hook.py", "timeout": 3}]}
     ]
   }
 }

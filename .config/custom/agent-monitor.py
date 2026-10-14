@@ -4,6 +4,7 @@
 import argparse
 import errno
 import fcntl
+import hashlib
 import json
 import os
 from pathlib import Path
@@ -248,6 +249,38 @@ def completed_color(job, now):
     return "38;2;" + ";".join(map(str, rgb))
 
 
+def record_turn(event):
+    session = hashlib.sha256(event['session_id'].encode()).hexdigest()
+    prepare_state()
+    directory = STATE_DIR / 'turns'
+    directory.mkdir(mode=0o700, exist_ok=True)
+    with (directory / 'events.lock').open('a') as lock:
+        fcntl.flock(lock, fcntl.LOCK_EX)
+        if event['hook_event_name'] == 'SessionEnd':
+            for path in directory.glob('*.json'):
+                turn = json.loads(path.read_text())
+                if turn['session'] == session:
+                    path.unlink()
+            return
+        turn_id = event['turn_id']
+        key = hashlib.sha256(f'{session}:{turn_id}'.encode()).hexdigest()
+        turn = {'session': session, 'active': event['hook_event_name'] == 'UserPromptSubmit'}
+        temporary = directory / f'{key}.tmp'
+        temporary.write_text(json.dumps(turn))
+        temporary.replace(directory / f'{key}.json')
+
+
+def turn_active():
+    directory = STATE_DIR / 'turns'
+    try:
+        lock = (directory / 'events.lock').open('r')
+    except FileNotFoundError:
+        return False
+    with lock:
+        fcntl.flock(lock, fcntl.LOCK_SH)
+        return any(json.loads(path.read_text())['active'] for path in directory.glob('*.json'))
+
+
 def status(compact=False):
     jobs = records()
     now = time.time()
@@ -302,6 +335,10 @@ def status(compact=False):
         if not recent:
             lines.append("No completed tasks.")
         for index, line in enumerate(lines[:max(0, rows - 1)]):
+            if index == 0 and not active:
+                thinking = turn_active()
+                indicator = 'thinking…' if thinking else 'idle'
+                line += f"\033[0m\033[{36 if thinking else 90}m {indicator}"
             display(line, colors.get(index), color_start=color_starts.get(index, 0))
         return
 
