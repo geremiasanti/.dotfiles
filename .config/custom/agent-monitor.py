@@ -165,6 +165,8 @@ def command_category(command, label=''):
         return 'LINT'
     if 'git' in names:
         return 'GIT'
+    if 'nvim-open.sh' in names:
+        return 'SHOW'
     if any(name in names for name in ('mysql', 'mysqladmin', 'psql', 'sqlite3', 'redis-cli')) or (
             'rails' in names and any(word.startswith('db:') for word in words)):
         return 'DB'

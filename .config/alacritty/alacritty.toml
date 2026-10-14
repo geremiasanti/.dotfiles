@@ -42,7 +42,7 @@ import = [
 ]
 
 [[hints.enabled]]
-command = { program = "/home/geremia/.config/custom/nvim-open.sh" }
+command = { program = "/home/geremia/.config/custom/nvim-open.sh", args = ["--focus"] }
 hyperlinks = false
 post_processing = true
 regex = "/?[\\w.+-]+(/[\\w.+-]+)+(:\\d+)?"

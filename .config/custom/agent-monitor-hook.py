@@ -16,6 +16,10 @@ WORKSPACES = ['/home/geremia/dev/CardTrader', '/home/geremia/dev/CardTrader-code
 
 def operation_name(command):
     words = shlex.split(command, comments=True)
+    for index, word in enumerate(words):
+        if Path(word).name == 'nvim-open.sh':
+            file = next((arg for arg in words[index + 1:] if not arg.startswith('-')), None)
+            return f'show-{Path(file).name}' if file else 'show-nvim'
     if 'rubocop' in words:
         return 'rubocop'
     if any(Path(word).name == 'eslint' for word in words):
@@ -61,7 +65,7 @@ def rewrite(event, workspaces):
         return {}
     # Sensitive output still requires the explicit opt-out; these exclusions cover known local sources.
     if any(value in command for value in ('database.yml', 'master.key', 'auth.json', '.ssh/', '.env',
-                                          'printenv', 'nvim-open.sh')):
+                                          'printenv')):
         return {}
     try:
         words = shlex.split(command, comments=True)
