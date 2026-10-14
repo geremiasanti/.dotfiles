@@ -60,9 +60,24 @@
 - Escludi credenziali, token, chiavi private e altri dati riservati. Controlla il contenuto prima di aggiungerlo a Git.
 - Chiedi il consenso prima di commit o push, salvo che siano già autorizzati nella richiesta corrente.
 
+## Monitoring
+
+- Negli altri progetti attiva il monitoring solo quando l'utente lo chiede; i progetti che lo richiedono esplicitamente fanno eccezione. Usa lo script personale `~/.config/custom/agent-monitor.py`.
+- Attivazione: esegui `~/.config/custom/agent-monitor.py open` una volta all'inizio del lavoro monitorato. Apre o riusa un terminale Alacritty nel workspace i3 7, con una sessione tmux dedicata. Non cambiare la configurazione i3 o spostare altre finestre.
+- Esegui i comandi terminale tramite `~/.config/custom/agent-monitor.py run <nome-operazione> -- <comando> <argomenti>`. Usa nomi descrittivi, ad esempio `test-system-3-worker`, `test-models-8-worker`, `rubocop`. Il comando deve restare nel contesto di esecuzione e nei permessi del tool; tmux mostra soltanto i log e non esegue il lavoro al posto del tool.
+- Usa sempre `run`: lo script mostra subito l'operazione nello storico e apre automaticamente un pane per l'output se il comando supera un secondo. I comandi rapidi non aprono pane. Non usare il wrapper per i suoi stessi comandi di gestione (`open`, `status`, `show`).
+- Usa una sola finestra tmux: la panoramica “Attività” resta sempre a sinistra e mostra operazioni in corso, comando, directory, durata, esito ed exit code. Senza task lunghi occupa tutto lo schermo; con un task lo schermo è diviso a metà; con due task è diviso in tre colonne uguali. Con più task, la panoramica resta a sinistra per tutta l'altezza e occupa un terzo; i task si distribuiscono nelle due colonne a destra, dividendone l'altezza in parti uguali, ad esempio `Attività | task1/task3 | task2/task4`.
+- Non cambiare scheda o focus quando iniziano o terminano i task. I pane dei task si chiudono alla fine e quelli rimasti si ridistribuiscono automaticamente, anche al ridimensionamento del terminale. Usa `Ctrl-b` seguito da una freccia per selezionare un pane e `Ctrl-b [` per lo scrollback.
+- Consultazione: `~/.config/custom/agent-monitor.py status` mostra lo storico; `~/.config/custom/agent-monitor.py show <id>` rilegge l'output salvato. I log sono in `/tmp/agent-monitor-<uid>/`, accessibili solo all'utente, e possono essere rimossi dal sistema al riavvio. Non versionarli nei dotfiles.
+- Il wrapper restituisce l'exit code del comando e mantiene l'output disponibile anche ai tool: continua a monitorarlo e verifica l'esito, non affidarti solo alla finestra visibile. Chiudere il terminale del monitor non interrompe i task. Lo script è per comandi non interattivi.
+- Passa comandi e argomenti separatamente, senza `eval`. Se servono variabili d'ambiente visibili nel comando, usa `run <nome> -- env RAILS_ENV=test PARALLEL_WORKERS=8 <comando>`. Mantieni limiti di worker, priorità ridotta e lock della suite prescritti dal progetto: il monitor non li applica automaticamente.
+- Non registrare comandi o output contenenti credenziali, token o dati riservati. Esegui questi controlli fuori dal wrapper, con output minimizzato, e segnala l'esclusione senza mostrare segreti. Le operazioni tramite tool non terminali, come `apply_patch`, restano nei tool dedicati e negli aggiornamenti in chat.
+
 ## Workflow locale — solo CardTrader
 
 Queste regole valgono esclusivamente per CardTrader e i suoi worktree, non per gli altri progetti.
+
+- In CardTrader usa sempre il monitoring descritto nella sezione “Monitoring” per i comandi terminale, sia in modalità diretta sia in modalità isolata, salvo le esclusioni per dati riservati e i comandi di gestione del monitor.
 
 ### Modalità di lavoro
 
