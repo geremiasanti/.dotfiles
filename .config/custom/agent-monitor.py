@@ -184,12 +184,14 @@ def command_category(command, label=''):
             return f'RUN:{languages[name]}'
         if Path(name).suffix in ('.py', '.js', '.ts', '.rb', '.sh'):
             return f'RUN:{Path(name).suffix[1:]}'
+    if any(name in names for name in ('sleep', 'printf', 'echo', 'true', 'false', 'date', 'pwd', 'timeout', 'seq')):
+        return 'CMD'
     return ''
 
 
 def task_category(job):
     category = job.get('category')
-    if category is None or category == 'RUN':
+    if category in (None, '', 'RUN'):
         return command_category(job.get('command', ''), job['label'])
     return category
 
