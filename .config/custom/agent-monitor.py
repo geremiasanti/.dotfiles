@@ -21,6 +21,7 @@ import time
 STATE_DIR = Path(tempfile.gettempdir()) / f"agent-monitor-{os.getuid()}"
 SCRIPT = Path(__file__).resolve()
 SESSION = "agent-monitor"
+COLORS = {31: (234, 74, 90), 32: (52, 208, 88), 33: (255, 234, 127), 36: (57, 197, 207)}
 
 
 def prepare_state():
@@ -154,6 +155,19 @@ def records():
     return jobs
 
 
+def completed_color(job, now):
+    exit_code = job.get("exit_code")
+    color = (33 if job["status"] == "INTERRUPTED" or exit_code in (130, 143)
+             else 32 if exit_code == 0 else 31)
+    finished = job.get("finished")
+    if finished is None or now - finished >= 5:
+        return color
+    progress = max(0, (now - finished) / 5)
+    rgb = [round(start + (end - start) * progress)
+           for start, end in zip(COLORS[36], COLORS[color])]
+    return "38;2;" + ";".join(map(str, rgb))
+
+
 def status(compact=False):
     jobs = records()
     now = time.time()
@@ -200,8 +214,7 @@ def status(compact=False):
             duration = finished - job["started"]
             exit_code = job.get("exit_code")
             result = str(exit_code) if exit_code is not None else '-'
-            colors[len(lines)] = (33 if job["status"] == "INTERRUPTED" or exit_code in (130, 143)
-                                  else 32 if exit_code == 0 else 31)
+            colors[len(lines)] = completed_color(job, now)
             label = operation_label(job)
             lines.append(f"{label:{operation_width}} {duration:6.1f}s  {result:>4}")
         if len(recent) > recent_limit:
@@ -234,12 +247,15 @@ def status(compact=False):
 def watch():
     try:
         print("\033[?25l", end="", flush=True)
+        next_reflow = 0
         while True:
-            reflow()
+            if time.monotonic() >= next_reflow:
+                reflow()
+                next_reflow = time.monotonic() + 1
             print("\033[H\033[2J", end="")
             status(compact=True)
             sys.stdout.flush()
-            time.sleep(1)
+            time.sleep(0.2)
     except KeyboardInterrupt:
         pass
     finally:
