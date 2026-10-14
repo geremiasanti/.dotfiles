@@ -18,7 +18,7 @@ import tempfile
 import time
 
 
-STATE_DIR = Path(tempfile.gettempdir()) / f"agent-monitor-{os.getuid()}"
+STATE_DIR = Path(os.environ.get('TMPDIR') or '/tmp') / f"agent-monitor-{os.getuid()}"
 SCRIPT = Path(__file__).resolve()
 SESSION = "agent-monitor"
 COLORS = {31: (234, 74, 90), 32: (52, 208, 88), 33: (255, 234, 127), 36: (57, 197, 207)}
@@ -150,8 +150,23 @@ def records():
         key=lambda record: record["started"], reverse=True,
     )
     for job in jobs:
-        if job["status"] == "RUNNING" and not Path(f"/proc/{job['pid']}").exists():
-            job["status"] = "INTERRUPTED"
+        if job['status'] != 'RUNNING':
+            continue
+        directory = STATE_DIR / job['id']
+        lock_path = directory / 'running.lock'
+        if lock_path.exists():
+            with lock_path.open('r') as lock:
+                try:
+                    fcntl.flock(lock, fcntl.LOCK_EX | fcntl.LOCK_NB)
+                except BlockingIOError:
+                    continue
+                job.update(json.loads((directory / 'state.json').read_text()))
+                if job['status'] == 'RUNNING':
+                    job.update(status='INTERRUPTED', finished=time.time())
+                    write_record(directory, job)
+        elif job.get('host_ui') or not Path(f"/proc/{job['pid']}").exists():
+            job.update(status='INTERRUPTED', finished=time.time())
+            write_record(directory, job)
     return jobs
 
 
@@ -176,11 +191,11 @@ def status(compact=False):
     recent = sorted((job for job in jobs if job["status"] != "RUNNING"),
                     key=lambda job: job.get("finished") or job["started"], reverse=True)
 
-    def display(line="", color=None):
+    def display(line="", color=None, color_start=0):
         line = line.replace("\n", "\\n").replace("\r", "\\r").replace("\t", "\\t")
         if compact and len(line) >= columns:
             line = line[:columns - 2] + "…"
-        print(f"\033[{color}m{line}\033[0m" if color else line)
+        print(f"{line[:color_start]}\033[{color}m{line[color_start:]}\033[0m" if color else line)
 
     if compact:
         operation_width = 25
@@ -191,9 +206,9 @@ def status(compact=False):
                 label = label[:operation_width - 1] + '…'
             return label
 
-        colors = {}
-        lines = [f"Running: {len(active)} | Completed: {len(recent)}", "",
-                 "RUNNING"]
+        colors = {0: 90}
+        color_starts = {0: 8}
+        lines = [f'RUNNING ({len(active)})']
         active_limit = min(len(active), max(0, (rows - 8) // 2))
         for job in active[:active_limit]:
             duration = now - job["started"]
@@ -202,10 +217,10 @@ def status(compact=False):
             lines.append(f"  {job['command']}")
         if len(active) > active_limit:
             lines.append(f"+ {len(active) - active_limit} more running")
-        elif not active:
-            colors[len(lines)] = 32
-            lines.append("No running tasks.")
-        lines.extend(["", "COMPLETED"])
+        completed_heading = len(lines) + 1
+        colors[completed_heading] = 90
+        color_starts[completed_heading] = 10
+        lines.extend(['', f'COMPLETED ({len(recent)})'])
         recent_limit = max(0, rows - len(lines) - 1)
         if len(recent) > recent_limit:
             recent_limit = max(0, recent_limit - 1)
@@ -222,7 +237,7 @@ def status(compact=False):
         if not recent:
             lines.append("No completed tasks.")
         for index, line in enumerate(lines[:max(0, rows - 1)]):
-            display(line, colors.get(index))
+            display(line, colors.get(index), color_start=color_starts.get(index, 0))
         return
 
     display("AGENT MONITORING — active commands and recent history")
@@ -247,9 +262,23 @@ def status(compact=False):
 def watch():
     try:
         print("\033[?25l", end="", flush=True)
+        panes = tmux("list-panes", "-t", SESSION, "-F", "#{pane_id} #{@monitor-job}").stdout.splitlines()
+        host_panes = {row.split()[1]: row.split()[0] for row in panes if len(row.split()) == 2}
         next_reflow = 0
         while True:
+            jobs = records()
+            running = {job['id']: job for job in jobs if job.get('host_ui') and job['status'] == 'RUNNING'}
+            for job_id in list(host_panes):
+                if job_id not in running:
+                    remove_task_pane(host_panes.pop(job_id))
+            for job_id, job in running.items():
+                if job_id not in host_panes and time.time() - job['started'] > 1:
+                    pane = add_task_pane(job['label'], STATE_DIR / job_id / 'output.log')
+                    tmux('set-option', '-p', '-t', pane, '@monitor-job', job_id)
+                    host_panes[job_id] = pane
             if time.monotonic() >= next_reflow:
+                live_panes = set(tmux('list-panes', '-t', SESSION, '-F', '#{pane_id}').stdout.splitlines())
+                host_panes = {job_id: pane for job_id, pane in host_panes.items() if pane in live_panes}
                 reflow()
                 next_reflow = time.monotonic() + 1
             print("\033[H\033[2J", end="")
@@ -338,12 +367,17 @@ def run_command(args):
         command = command[1:]
     if not command:
         raise ValueError("Specify a command after --.")
-    ensure_session()
+    if not args.host_ui:
+        ensure_session()
     directory = Path(tempfile.mkdtemp(prefix=time.strftime("%Y%m%d-%H%M%S-"), dir=STATE_DIR))
+    # File locks identify the live runner across PID namespaces and are released even on SIGKILL.
+    run_lock = (directory / 'running.lock').open('a')
+    fcntl.flock(run_lock, fcntl.LOCK_EX)
     record = {
         "id": directory.name, "label": args.label, "cwd": str(Path.cwd()),
         "command": shlex.join(command), "pid": os.getpid(), "started": time.time(),
         "status": "RUNNING", "exit_code": None,
+        "host_ui": args.host_ui,
     }
     write_record(directory, record)
     pane_id = None
@@ -365,7 +399,7 @@ def run_command(args):
             with selectors.DefaultSelector() as selector:
                 selector.register(master, selectors.EVENT_READ)
                 while True:
-                    if pane_id is None and time.monotonic() - started > 1 and process.poll() is None:
+                    if not args.host_ui and pane_id is None and time.monotonic() - started > 1 and process.poll() is None:
                         pane_id = add_task_pane(args.label, directory / "output.log")
                     for _key, _events in selector.select(timeout=0.1):
                         try:
@@ -402,6 +436,7 @@ def run_command(args):
         record.update(finished=time.time(), exit_code=exit_code,
                       status="OK" if exit_code == 0 else "FAILED")
         write_record(directory, record)
+        run_lock.close()
         summary = f"\n{record['status']} | exit {exit_code} | {record['finished'] - record['started']:.1f}s\n"
         with (directory / "output.log").open("ab") as log:
             log.write(summary.encode())
@@ -418,6 +453,7 @@ def main():
     opener = commands.add_parser("open", help="Open tmux monitoring in i3 workspace 7")
     opener.add_argument("--workspace", type=int, default=7)
     runner = commands.add_parser("run", help="Run a non-interactive command and preserve its exit code")
+    runner.add_argument('--host-ui', action='store_true', help='Let the existing host viewer manage task panes')
     runner.add_argument("label")
     runner.add_argument("command", nargs=argparse.REMAINDER)
     commands.add_parser("status", help="Show running operations and recent history")
@@ -425,7 +461,16 @@ def main():
     shower = commands.add_parser("show", help="Print the saved output of an operation")
     shower.add_argument("id")
     args = parser.parse_args()
-    prepare_state()
+    try:
+        prepare_state()
+    except OSError as error:
+        if args.action != 'run' or not args.host_ui or error.errno not in (errno.EROFS, errno.EACCES):
+            raise
+        command = args.command[1:] if args.command[:1] == ['--'] else args.command
+        if not command:
+            parser.error('Specify a command after --.')
+        print('Monitoring unavailable: running command without logging.', file=sys.stderr)
+        os.execvp(command[0], command)
     if args.action == "open":
         open_monitor(args.workspace)
     elif args.action == "run":
