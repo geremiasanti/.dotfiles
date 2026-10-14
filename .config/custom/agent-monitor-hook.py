@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Prototype: insert command monitoring through a Codex PreToolUse hook."""
+"""Monitor Codex commands, file edits and turn lifecycle through hooks."""
 
 import argparse
 import importlib.util
@@ -91,14 +91,27 @@ def main():
     args = parser.parse_args()
     event = json.load(sys.stdin)
     workspaces = args.workspace or WORKSPACES
-    if event['hook_event_name'] in ('UserPromptSubmit', 'Stop', 'Interrupt', 'SessionEnd'):
-        cwd = Path(event['cwd']).resolve()
-        if any(cwd.is_relative_to(Path(workspace).resolve()) for workspace in workspaces):
+    cwd = Path(event['cwd']).resolve()
+    scoped = any(cwd.is_relative_to(Path(workspace).resolve()) for workspace in workspaces)
+    if scoped and event['hook_event_name'] == 'PreToolUse':
+        spec = importlib.util.spec_from_file_location('agent_monitor', MONITOR)
+        monitor = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(monitor)
+        monitor.prepare_state()
+        session = monitor.hashlib.sha256(event['session_id'].encode()).hexdigest()
+        # Sequential tool calls recover edits whose failure produced no PostToolUse.
+        monitor.finish_pending_edits(session, event['turn_id'], interrupted=False)
+    if (event['hook_event_name'] in ('UserPromptSubmit', 'Stop', 'Interrupt', 'SessionEnd')
+            or event.get('tool_name') == 'apply_patch'):
+        if scoped:
             os.umask(0o077)
             spec = importlib.util.spec_from_file_location('agent_monitor', MONITOR)
             monitor = importlib.util.module_from_spec(spec)
             spec.loader.exec_module(monitor)
-            monitor.record_turn(event)
+            if event.get('tool_name') == 'apply_patch':
+                monitor.record_edit(event)
+            else:
+                monitor.record_turn(event)
         print('{}')
     else:
         print(json.dumps(rewrite(event, workspaces)))

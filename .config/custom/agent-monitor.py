@@ -23,7 +23,7 @@ import time
 STATE_DIR = Path(os.environ.get('TMPDIR') or '/tmp') / f"agent-monitor-{os.getuid()}"
 SCRIPT = Path(__file__).resolve()
 SESSION = "agent-monitor"
-COLORS = {31: (234, 74, 90), 32: (52, 208, 88), 33: (255, 234, 127), 36: (57, 197, 207)}
+COLORS = {31: (234, 74, 90), 32: (52, 208, 88), 33: (255, 234, 127), 36: (57, 197, 207), 90: (139, 148, 158)}
 
 
 def prepare_state():
@@ -218,6 +218,8 @@ def records():
     for job in jobs:
         if job['status'] != 'RUNNING':
             continue
+        if job.get('source') == 'hook':
+            continue
         directory = STATE_DIR / job['id']
         lock_path = directory / 'running.lock'
         if lock_path.exists():
@@ -239,7 +241,7 @@ def records():
 def completed_color(job, now):
     exit_code = job.get("exit_code")
     color = (33 if job["status"] == "INTERRUPTED" or exit_code in (130, 143)
-             else 32 if exit_code == 0 else 31)
+             else 90 if exit_code is None else 32 if exit_code == 0 else 31)
     finished = job.get("finished")
     if finished is None or now - finished >= 5:
         return color
@@ -252,6 +254,8 @@ def completed_color(job, now):
 def record_turn(event):
     session = hashlib.sha256(event['session_id'].encode()).hexdigest()
     prepare_state()
+    if event['hook_event_name'] in ('Stop', 'Interrupt', 'SessionEnd'):
+        finish_pending_edits(session, event.get('turn_id'), interrupted=event['hook_event_name'] != 'Stop')
     directory = STATE_DIR / 'turns'
     directory.mkdir(mode=0o700, exist_ok=True)
     with (directory / 'events.lock').open('a') as lock:
@@ -268,6 +272,86 @@ def record_turn(event):
         temporary = directory / f'{key}.tmp'
         temporary.write_text(json.dumps(turn))
         temporary.replace(directory / f'{key}.json')
+
+
+def record_edit(event):
+    prepare_state()
+    session = hashlib.sha256(event['session_id'].encode()).hexdigest()
+    key = hashlib.sha256(f"{session}:{event['tool_use_id']}".encode()).hexdigest()
+    directory = STATE_DIR / f'edit-{key}'
+    with (STATE_DIR / 'edits.lock').open('a') as lock:
+        fcntl.flock(lock, fcntl.LOCK_EX)
+        if event['hook_event_name'] == 'PreToolUse':
+            patch = event['tool_input']['command']
+            files = re.findall(r'^\*\*\* (?:Add|Update|Delete) File: (.+)$', patch, re.MULTILINE)
+            files += re.findall(r'^\*\*\* Move to: (.+)$', patch, re.MULTILINE)
+            # Only file paths are logged; patch bodies may contain private data.
+            if any(Path(file).name in ('database.yml', 'master.key', 'auth.json', '.env')
+                   or '.ssh' in Path(file).parts for file in files):
+                return
+            directory.mkdir(mode=0o700, exist_ok=True)
+            if (directory / 'state.json').exists():
+                return
+            label = f'edit-{Path(files[0]).name}' if files else 'edit-files'
+            if len(files) > 1:
+                label += f' +{len(files) - 1}'
+            record = dict(id=directory.name, label=label, cwd=event['cwd'],
+                          command='apply_patch ' + shlex.join(files), started=time.time(),
+                          status='RUNNING', exit_code=None, host_ui=True, category='EDIT',
+                          source='hook', session=session, turn_id=event['turn_id'])
+            (directory / 'output.log').write_text('apply_patch\n' + '\n'.join(files) + '\n')
+            write_record(directory, record)
+        elif (directory / 'state.json').exists():
+            record = json.loads((directory / 'state.json').read_text())
+            response = event.get('tool_response')
+            exit_code = edit_exit_code(response)
+            record.update(finished=time.time(), exit_code=exit_code,
+                          status='OK' if exit_code == 0 else 'FAILED' if exit_code is not None else 'COMPLETED')
+            write_record(directory, record)
+            with (directory / 'output.log').open('a') as log:
+                log.write(f"{record['status']} | exit {exit_code if exit_code is not None else '-'}\n")
+
+
+def edit_exit_code(response):
+    if isinstance(response, dict):
+        if isinstance(response.get('exit_code'), int):
+            return response['exit_code']
+        if response.get('isError') is True or response.get('success') is False:
+            return 1
+        if response.get('success') is True:
+            return 0
+        for value in response.values():
+            result = edit_exit_code(value)
+            if result is not None:
+                return result
+    elif isinstance(response, list):
+        for value in response:
+            result = edit_exit_code(value)
+            if result is not None:
+                return result
+    elif isinstance(response, str):
+        exit_code = re.search(r'^Exit code: (\d+)$', response, re.MULTILINE)
+        if exit_code:
+            return int(exit_code[1])
+        if response.startswith('Success. Updated the following files:'):
+            return 0
+        if response.startswith(('Failed to', 'Invalid patch', 'apply_patch verification failed', 'Error:')):
+            return 1
+    return None
+
+
+def finish_pending_edits(session, turn_id, interrupted=True):
+    with (STATE_DIR / 'edits.lock').open('a') as lock:
+        fcntl.flock(lock, fcntl.LOCK_EX)
+        for path in STATE_DIR.glob('edit-*/state.json'):
+            record = json.loads(path.read_text())
+            if (record['status'] == 'RUNNING' and record['session'] == session
+                    and (turn_id is None or record['turn_id'] == turn_id)):
+                record.update(status='INTERRUPTED' if interrupted else 'COMPLETED',
+                              finished=time.time(), exit_code=143 if interrupted else None)
+                write_record(path.parent, record)
+                with (path.parent / 'output.log').open('a') as log:
+                    log.write('Interrupted.\n' if interrupted else 'Tool result unavailable.\n')
 
 
 def turn_active():
@@ -335,9 +419,9 @@ def status(compact=False):
         if not recent:
             lines.append("No completed tasks.")
         for index, line in enumerate(lines[:max(0, rows - 1)]):
-            if index == 0 and not active:
+            if index == 0:
                 thinking = turn_active()
-                indicator = 'thinking…' if thinking else 'idle'
+                indicator = 'thinking…' if thinking else 'waiting…' if active else 'idle'
                 line += f"\033[0m\033[{36 if thinking else 90}m {indicator}"
             display(line, colors.get(index), color_start=color_starts.get(index, 0))
         return

@@ -10,6 +10,16 @@
             "timeout": 5
           }
         ]
+      },
+      {
+        "matcher": "^apply_patch$",
+        "hooks": [{"type": "command", "command": "python3 /home/geremia/.config/custom/agent-monitor-hook.py", "timeout": 5}]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "^apply_patch$",
+        "hooks": [{"type": "command", "command": "python3 /home/geremia/.config/custom/agent-monitor-hook.py", "timeout": 5}]
       }
     ],
     "UserPromptSubmit": [
