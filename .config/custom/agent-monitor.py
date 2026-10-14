@@ -42,15 +42,15 @@ def ensure_session():
         fcntl.flock(lock, fcntl.LOCK_EX)
         if tmux("has-session", "-t", SESSION, check=False).returncode:
             tmux("-f", "/dev/null", "new-session", "-d", "-s", SESSION,
-                 "-n", "Attività", sys.executable, str(SCRIPT), "watch")
+                 "-n", "Activity", sys.executable, str(SCRIPT), "watch")
             tmux("set-option", "-t", SESSION, "mouse", "on")
             tmux("set-option", "-t", SESSION, "status-right", "Agent Monitoring")
         if tmux("show-option", "-v", "-t", SESSION, "@overview-pane", check=False).returncode:
-            overview = tmux("list-panes", "-t", f"{SESSION}:Attività", "-F", "#{pane_id}").stdout.splitlines()[0]
+            overview = tmux("list-panes", "-t", f"{SESSION}:Activity", "-F", "#{pane_id}").stdout.splitlines()[0]
             tmux("set-option", "-t", SESSION, "@overview-pane", overview)
-            tmux("select-pane", "-t", overview, "-T", "Attività")
-            tmux("set-option", "-w", "-t", f"{SESSION}:Attività", "pane-border-status", "top")
-            tmux("set-option", "-w", "-t", f"{SESSION}:Attività", "pane-border-format", " #{pane_title} ")
+            tmux("select-pane", "-t", overview, "-T", "Activity")
+            tmux("set-option", "-w", "-t", f"{SESSION}:Activity", "pane-border-status", "top")
+            tmux("set-option", "-w", "-t", f"{SESSION}:Activity", "pane-border-format", " #{pane_title} ")
 
 
 def layout_string(panes, width, height):
@@ -162,38 +162,54 @@ def status(compact=False):
     recent = sorted((job for job in jobs if job["status"] != "RUNNING"),
                     key=lambda job: job.get("finished") or job["started"], reverse=True)
 
-    def display(line=""):
+    def display(line="", color=None):
         line = line.replace("\n", "\\n").replace("\r", "\\r").replace("\t", "\\t")
         if compact and len(line) >= columns:
             line = line[:columns - 2] + "…"
-        print(line)
+        print(f"\033[{color}m{line}\033[0m" if color else line)
 
     if compact:
-        lines = [f"In corso: {len(active)} | Completate: {len(recent)}", "",
-                 "IN CORSO", "  DURATA  OPERAZIONE / COMANDO"]
-        capacity = max(0, rows - 10)
-        active_limit = min(len(active), max(0, capacity - (1 if recent else 0)))
+        operation_width = 25
+
+        def operation_label(job):
+            label = job['label'].replace('\n', '\\n').replace('\r', '\\r').replace('\t', '\\t')
+            if len(label) > operation_width:
+                label = label[:operation_width - 1] + '…'
+            return label
+
+        colors = {}
+        lines = [f"Running: {len(active)} | Completed: {len(recent)}", "",
+                 "RUNNING"]
+        active_limit = min(len(active), max(0, (rows - 8) // 2))
         for job in active[:active_limit]:
             duration = now - job["started"]
-            lines.append(f"{duration:7.1f}s  {job['label']} | {job['command']}")
+            colors[len(lines)] = 36
+            lines.append(f"{operation_label(job):{operation_width}} {duration:6.1f}s")
+            lines.append(f"  {job['command']}")
         if len(active) > active_limit:
-            lines.append(f"+ {len(active) - active_limit} altre in corso (status)")
+            lines.append(f"+ {len(active) - active_limit} more running")
         elif not active:
-            lines.append("Nessuna operazione in corso.")
-        lines.extend(["", "ULTIME COMPLETATE", "ORA       ESITO / EXIT    DURATA  OPERAZIONE"])
-        recent_limit = max(0, rows - len(lines) - 3)
+            colors[len(lines)] = 32
+            lines.append("No running tasks.")
+        lines.extend(["", "COMPLETED"])
+        recent_limit = max(0, rows - len(lines) - 1)
+        if len(recent) > recent_limit:
+            recent_limit = max(0, recent_limit - 1)
         for job in recent[:recent_limit]:
             finished = job.get("finished") or job["started"]
-            stamp = time.strftime('%H:%M:%S', time.localtime(finished))
             duration = finished - job["started"]
             exit_code = job.get("exit_code")
-            result = f"{job['status']}/{exit_code if exit_code is not None else '-'}"
-            lines.append(f"{stamp}  {result:13} {duration:6.1f}s  {job['label']}")
+            result = str(exit_code) if exit_code is not None else '-'
+            colors[len(lines)] = (33 if job["status"] == "INTERRUPTED" or exit_code in (130, 143)
+                                  else 32 if exit_code == 0 else 31)
+            label = operation_label(job)
+            lines.append(f"{label:{operation_width}} {duration:6.1f}s  {result:>4}")
+        if len(recent) > recent_limit:
+            lines.append("...")
         if not recent:
-            lines.append("Nessuna operazione completata.")
-        lines.extend(["", "Dettagli: status | Log: show <id>"])
-        for line in lines[:max(0, rows - 1)]:
-            display(line)
+            lines.append("No completed tasks.")
+        for index, line in enumerate(lines[:max(0, rows - 1)]):
+            display(line, colors.get(index))
         return
 
     display("AGENT MONITORING — active commands and recent history")
@@ -213,8 +229,6 @@ def status(compact=False):
         display()
     if not jobs:
         display("No operations yet.")
-    elif compact:
-        display("Full history: agent-monitor.py status | Output: agent-monitor.py show <id>")
 
 
 def watch():
