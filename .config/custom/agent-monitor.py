@@ -158,7 +158,9 @@ def status(compact=False):
     jobs = records()
     now = time.time()
     columns, rows = shutil.get_terminal_size(fallback=(120, 40))
-    limit = max(1, (rows - 7) // 5) if compact else 30
+    active = [job for job in jobs if job["status"] == "RUNNING"]
+    recent = sorted((job for job in jobs if job["status"] != "RUNNING"),
+                    key=lambda job: job.get("finished") or job["started"], reverse=True)
 
     def display(line=""):
         line = line.replace("\n", "\\n").replace("\r", "\\r").replace("\t", "\\t")
@@ -166,14 +168,40 @@ def status(compact=False):
             line = line[:columns - 2] + "…"
         print(line)
 
+    if compact:
+        lines = [f"In corso: {len(active)} | Completate: {len(recent)}", "",
+                 "IN CORSO", "  DURATA  OPERAZIONE / COMANDO"]
+        capacity = max(0, rows - 10)
+        active_limit = min(len(active), max(0, capacity - (1 if recent else 0)))
+        for job in active[:active_limit]:
+            duration = now - job["started"]
+            lines.append(f"{duration:7.1f}s  {job['label']} | {job['command']}")
+        if len(active) > active_limit:
+            lines.append(f"+ {len(active) - active_limit} altre in corso (status)")
+        elif not active:
+            lines.append("Nessuna operazione in corso.")
+        lines.extend(["", "ULTIME COMPLETATE", "ORA       ESITO / EXIT    DURATA  OPERAZIONE"])
+        recent_limit = max(0, rows - len(lines) - 3)
+        for job in recent[:recent_limit]:
+            finished = job.get("finished") or job["started"]
+            stamp = time.strftime('%H:%M:%S', time.localtime(finished))
+            duration = finished - job["started"]
+            exit_code = job.get("exit_code")
+            result = f"{job['status']}/{exit_code if exit_code is not None else '-'}"
+            lines.append(f"{stamp}  {result:13} {duration:6.1f}s  {job['label']}")
+        if not recent:
+            lines.append("Nessuna operazione completata.")
+        lines.extend(["", "Dettagli: status | Log: show <id>"])
+        for line in lines[:max(0, rows - 1)]:
+            display(line)
+        return
+
     display("AGENT MONITORING — active commands and recent history")
     display()
     display(f"Running: {sum(job['status'] == 'RUNNING' for job in jobs)} | Logs: {STATE_DIR}")
     display("Activity stays left; live task output appears in adjacent panes.")
     display()
-    active = [job for job in jobs if job["status"] == "RUNNING"]
-    recent = [job for job in jobs if job["status"] != "RUNNING"]
-    for job in (active + recent)[:limit]:
+    for job in (active + recent)[:30]:
         state = job["status"]
         duration = (job.get("finished") or now) - job["started"]
         exit_code = "" if job.get("exit_code") is None else f" | exit {job['exit_code']}"
@@ -231,7 +259,8 @@ def open_monitor(workspace):
     focused = next((node["id"] for node in tree if node.get("focused")), None)
     with (STATE_DIR / "terminal.log").open("ab") as log:
         terminal = subprocess.Popen(
-            ["alacritty", "--class", "AgentMonitor", "--title", "Agent Monitoring", "-e",
+            ["alacritty", "--class", "AgentMonitor", "--title", "Agent Monitoring",
+             "-o", "font.size=13", "-e",
              "tmux", "-S", str(STATE_DIR / "tmux.sock"), "attach-session", "-t", SESSION],
             stdout=log, stderr=log, start_new_session=True,
         )
