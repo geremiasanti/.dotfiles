@@ -32,6 +32,12 @@
 - Inserisci il nuovo codice vicino alle parti con cui collabora, nel gruppo tematico appropriato e rispettando l'ordine esistente.
 - Se non esiste un punto logico, aggiungilo in coda al gruppo o al file.
 
+## Blocchi logici
+
+- Separa con una riga vuota i blocchi con responsabilità distinte: ad esempio operazioni e redirect, oppure operazioni indipendenti con condizioni diverse.
+- Mantieni consecutive le istruzioni strettamente collegate, come il recupero di un valore e il controllo che lo usa. Separa l'intero blocco dal resto.
+- Non inserire righe vuote meccanicamente tra ogni istruzione: la spaziatura deve rendere visibili i blocchi logici.
+
 ## Cronologia Git
 
 - Preferisco i merge ai rebase. Valuta e proponi eventuali eccezioni.
