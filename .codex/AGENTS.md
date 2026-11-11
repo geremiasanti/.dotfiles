@@ -40,6 +40,7 @@
 
 ## Cronologia Git
 
+- Usa nomi di branch semplici e descrittivi, senza prefissi legati allo strumento come `codex/`: ad esempio `seller-churn-rate`, non `codex/seller-churn-rate`.
 - Preferisco i merge ai rebase. Valuta e proponi eventuali eccezioni.
 - Non riscrivere la cronologia: niente `--amend`, reset di commit esistenti, rebase interattivi, squash o push forzati, nemmeno con `--force-with-lease`.
 - Registra le correzioni con nuovi commit. Per spostare modifiche tra branch, usa un commit che le toglie dal primo e uno che le aggiunge al secondo.
