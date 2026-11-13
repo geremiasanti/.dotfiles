@@ -16,6 +16,14 @@
 - Niente hedging: i fatti si affermano direttamente, senza "probabilmente", "potrebbe", "direi". L'incertezza reale non è hedging: va dichiarata una volta sola, in modo esplicito, distinguendo il verificato dal dedotto.
 - Cita le fonti: `path:riga` per il codice, URL per la documentazione, comando eseguito per i risultati misurati.
 
+## Testi scritti per altri (descrizioni di PR, card, commenti, documentazione)
+
+- Corti e proporzionati al cambiamento: pochi punti che dicono cosa è stato fatto e perché, con i link utili (card, pagine toccate, documento di riferimento).
+- Si scrive a partire dall'effetto del cambiamento, non dall'elenco dei file. Ogni parte del diff trova la sua spiegazione in un punto; nessun punto parla di cose che nel diff non ci sono.
+- Restano fuori: dettagli implementativi, elenchi pagina per pagina o file per file, misure e verifiche fatte, storia dei commit, sezioni "fuori da questa PR". Quelle informazioni si riportano in chat, non nel testo.
+- Più dettaglio solo se lo chiedo esplicitamente.
+- Misura di riferimento per una descrizione di PR: link alla card, una riga che dice il soggetto del cambiamento (es. "Modifiche SEO alla struttura dei titoli di homepage e landing:"), poi 2-4 punti di una riga o due ciascuno.
+
 ## Review e spiegazioni a punti: processo sequenziale
 
 Quando lavoriamo su una lista di punti (review di codice, spiegazioni a scaletta, checklist):
