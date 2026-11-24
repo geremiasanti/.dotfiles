@@ -172,6 +172,8 @@ bindsym $mod+Ctrl+Shift+e exec "i3-msg exit"
 # reboot system
 bindsym $mod+Ctrl+Shift+r exec "systemctl reboot"
 bindsym $mod+Ctrl+Shift+q exec "systemctl poweroff"
+# lock screen (xss-lock runs i3lock)
+bindsym $mod+Shift+x exec --no-startup-id loginctl lock-session
 
 # screenshots
 bindsym $mod+Shift+s exec scrot ~/Pictures/Screenshots/screenshot_%Y-%m-%d-%H%M%S.png
