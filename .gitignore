@@ -26,6 +26,8 @@
 !.config/picom/**
 !.config/assets/
 !.config/assets/**
+!.config/agents/
+!.config/agents/AGENTS.md
 
 # unignore only Codex global instructions
 !.codex/
